@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
         AdmitadTracker.initialize(getApplicationContext(), "TestAndroidPostback", new TrackerInitializationCallback() {
             @Override
             public void onInitializationSuccess() {
-
+                AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=TestUidAndroid"));
             }
 
             @Override
