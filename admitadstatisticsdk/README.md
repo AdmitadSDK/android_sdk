@@ -15,7 +15,6 @@ How to use SDK:
 2) Admitad uid is required for sending logs. You can pass deeplink by method AdmitadTracker#handleDeeplink
 
 3) After you call AdmitadTracker#initialize, you can start logging even if sdk is still not initialized. For logging you can use methods AdmitadTracker#log*.
-
     For every log type there're different params you have to pass, callback is optional;
 
 4) To log purchase or order you have to create AdmitadOrder object using builder. e.g.:
