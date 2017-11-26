@@ -54,7 +54,17 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
                 .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 5))
                 .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "Kek").putExtra("Age", "10"))
                 .build();
-        AdmitadTracker.getInstance().logOrder(order);
+        AdmitadTracker.getInstance().logOrder(order, new TrackerListener() {
+            @Override
+            public void onSuccess(AdmitadEvent result) {
+
+            }
+
+            @Override
+            public void onFailure(int errorCode, @Nullable String errorText) {
+
+            }
+        });
     }
 
     public void purchaseClick(View v) {

@@ -13,6 +13,7 @@ import android.util.Pair;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +32,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private final NetworkRepository networkRepository;
     private final Handler uiHandler;
     private final Set<TrackerListener> listeners = new LinkedHashSet<>();
-    private final List<Pair<AdmitadEvent, TrackerListener>> eventQueue = new LinkedList<>();
+    private final List<Pair<AdmitadEvent, WeakReference<TrackerListener>>> eventQueue = new LinkedList<>();
     private final Context context;
     private NetworkState networkState;
     private String gaid;
@@ -64,10 +65,10 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     @Override
-    public void log(AdmitadEvent event, TrackerListener trackerListener) {
+    public void log(AdmitadEvent event, @Nullable TrackerListener trackerListener) {
         logConsole("New event: " + event.toString());
         databaseRepository.insertOrUpdate(event);
-        eventQueue.add(0, new Pair<>(event, trackerListener));
+        eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
         tryLog();
     }
 
@@ -130,7 +131,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                 }
             }
 
-            Pair<AdmitadEvent, TrackerListener> admitadPair = eventQueue.get(eventQueue.size() - 1);
+            Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair = eventQueue.get(eventQueue.size() - 1);
             AdmitadEvent admitadEvent = admitadPair.first;
             if (errorCode == AdmitadTrackerCode.NONE) {
                 logConsole("Trying to send " + admitadEvent.toString());
@@ -195,11 +196,14 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         }).start();
     }
 
-    private void onLogSuccess(Pair<AdmitadEvent, TrackerListener> admitadPair) {
+    private void onLogSuccess(Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair) {
         logConsole("log success " + admitadPair.first.toString());
         isBusy = false;
         if (admitadPair.second != null) {
-            admitadPair.second.onSuccess(admitadPair.first);
+            TrackerListener trackerListener = admitadPair.second.get();
+            if (trackerListener != null) {
+                trackerListener.onSuccess(admitadPair.first);
+            }
         }
         notifyLogSuccess(admitadPair.first);
         databaseRepository.remove(admitadPair.first.id);
@@ -207,7 +211,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         tryLog();
     }
 
-    private void onLogFailed(Pair<AdmitadEvent, TrackerListener> admitadPair, int errorCode, @Nullable String errorText) {
+    private void onLogFailed(Pair<AdmitadEvent,  WeakReference<TrackerListener>> admitadPair, int errorCode, @Nullable String errorText) {
         logConsole("Log failed, errorCode = " + errorCode + ", text = " + errorText);
         isBusy = false;
         if (!networkState.isOnline() && errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE) {
@@ -218,7 +222,10 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
             onServerUnavailable();
         }
         if (admitadPair.second != null) {
-            admitadPair.second.onFailure(errorCode, errorText);
+            TrackerListener trackerListener = admitadPair.second.get();
+            if (trackerListener != null) {
+                trackerListener.onFailure(errorCode, errorText);
+            }
         }
         notifyLogFailed(errorCode, errorText);
         if (errorCode != AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE
@@ -250,9 +257,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     private class NetworkLogCallback implements TrackerListener {
-        private final Pair<AdmitadEvent, TrackerListener> admitadPair;
+        private final Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair;
 
-        private NetworkLogCallback(@NonNull Pair<AdmitadEvent, TrackerListener> admitadPair) {
+        private NetworkLogCallback(@NonNull Pair<AdmitadEvent,  WeakReference<TrackerListener>> admitadPair) {
             this.admitadPair = admitadPair;
         }
 
@@ -281,7 +288,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
             GaidAsyncTaskResult result = new GaidAsyncTaskResult();
             isServerUnavailable = !networkRepository.isServerAvailable();
             for (AdmitadEvent admitadEvent : databaseRepository.findAll()) {
-                eventQueue.add(new Pair<AdmitadEvent, TrackerListener>(admitadEvent, null));
+                eventQueue.add(new Pair<AdmitadEvent, WeakReference<TrackerListener>>(admitadEvent, null));
             }
             result.gaid = Utils.getCachedGAID(context);
             admitadUid = Utils.getAdmitadUid(context);
