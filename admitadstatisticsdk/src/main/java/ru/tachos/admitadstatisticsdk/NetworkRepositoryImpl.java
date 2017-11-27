@@ -26,7 +26,14 @@ import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_RETURNED_USER
 public class NetworkRepositoryImpl implements NetworkRepository {
     private static final String TRACKING = "tracking";
     private static final String TAG = "AdmitadTracker";
+
+    private static final String SCHEME = "https";
     private static final String HOST = "ad.admitad.com";
+    private static final String PATH = "r";
+
+    private static final String SCHEME_INSTALL = "https";
+    private static final String HOST_INSTALL = "ad.admitad.com";
+    private static final String PATH_INSTALL= "r";
 
     private OkHttpClient okHttpClient;
     private Handler uiHandler;
@@ -38,10 +45,16 @@ public class NetworkRepositoryImpl implements NetworkRepository {
 
     @Override
     public void log(final AdmitadEvent admitadEvent, final TrackerListener trackerListener) {
-        HttpUrl.Builder httpUrlBuilder = new HttpUrl.Builder()
-                .scheme("https")
-                .host(HOST)
-                .addPathSegment("r");
+        HttpUrl.Builder httpUrlBuilder = new HttpUrl.Builder();
+        if (admitadEvent.type == TYPE_FIRST_LAUNCH) {
+            httpUrlBuilder.scheme(SCHEME_INSTALL)
+                    .host(HOST_INSTALL)
+                    .addPathSegment(PATH_INSTALL);
+        } else {
+            httpUrlBuilder.scheme(SCHEME)
+                    .host(HOST)
+                    .addPathSegment(PATH);
+        }
         for (String key : admitadEvent.params.keySet()) {
             httpUrlBuilder.addQueryParameter(key, admitadEvent.params.get(key));
         }

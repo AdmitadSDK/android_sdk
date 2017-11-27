@@ -22,7 +22,7 @@ public final class AdmitadTracker {
         controller.removeListener(listener);
     }
 
-    public void handleDeeplink(Uri uri) {
+    public void handleDeeplink(@Nullable Uri uri) {
         controller.handleDeeplink(uri);
     }
 
