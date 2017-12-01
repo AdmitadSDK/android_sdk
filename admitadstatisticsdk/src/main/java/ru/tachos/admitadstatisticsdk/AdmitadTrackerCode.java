@@ -23,7 +23,7 @@ public @interface AdmitadTrackerCode {
 
     int ERROR_GENERIC = -100;
     int ERROR_NO_INTERNET = -200;
-    int ERROR_SERVER_UNAVAILABLE = -300;
+    int ERROR_SERVER_UNAVAILABLE = -1;
     int ERROR_SDK_NOT_INITIALIZED = -1000;
     int ERROR_SDK_POSTBACK_CODE_MISSED = -1100;
     int ERROR_SDK_GAID_MISSED = -1200;

@@ -24,8 +24,8 @@ import ru.tachos.admitadstatisticsdk.network_state.NetworkManager;
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
 
 final class TrackerControllerImpl implements TrackerController, NetworkManager.Listener {
-    private final static long TIME_TO_CHECK_SERVER = TimeUnit.MINUTES.toMillis(5);
-    private final static long TIME_TO_TRY_AGAIN = TimeUnit.MINUTES.toMillis(2);
+    private final static long TIME_TO_CHECK_SERVER = TimeUnit.SECONDS.toMillis(10);
+    private final static long TIME_TO_TRY_AGAIN = TimeUnit.SECONDS.toMillis(5);
 
     private final static String TAG = "AdmitadTracker";
     private final static String URI_KEY_ADMITAD_UID = "uid";
@@ -172,29 +172,25 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
             return;
         }
         uiHandler.removeCallbacksAndMessages(null);
-        logConsole("Try to check if server available");
-        new Thread(new Runnable() {
+
+        uiHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                isServerUnavailable = !networkRepository.isServerAvailable();
-                logConsole("Checked server, server available = " + !isServerUnavailable);
-                uiHandler.post(new Runnable() {
+                new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        logConsole("Try to check if server available");
+                        isServerUnavailable = !networkRepository.isServerAvailable();
+                        logConsole("Checked server, server available = " + !isServerUnavailable);
                         if (isServerUnavailable) {
-                            uiHandler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    onServerUnavailable();
-                                }
-                            }, TIME_TO_CHECK_SERVER);
+                            onServerUnavailable();
                         } else {
                             tryLog();
                         }
                     }
-                });
+                }).start();
             }
-        }).start();
+        }, TIME_TO_CHECK_SERVER);
     }
 
     private void onLogSuccess(Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair) {
@@ -218,10 +214,8 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         if (!networkState.isOnline() && errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE) {
             errorCode = AdmitadTrackerCode.ERROR_NO_INTERNET;
         }
-        if (errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE
-                || (errorText != null && errorText.contains("CertPathValidatorException"))) {
+        if (errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE) {
             isServerUnavailable = true;
-            errorCode = AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE;
             onServerUnavailable();
         }
         if (admitadPair.second != null) {
