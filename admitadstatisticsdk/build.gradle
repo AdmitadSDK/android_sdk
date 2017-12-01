@@ -1,5 +1,29 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'android_sdk'
+    bintrayName = 'admitadstatisticsdk'
+
+    publishedGroupId = 'ru.tachos.admitadstatisticsdk'
+    libraryName = 'admitadstatisticsdk'
+    artifact = 'admitadstatisticsdk'
+
+    libraryDescription = 'A library for logging Admitad events'
+
+    siteUrl = 'https://github.com/AdmitadSDK/android_sdk'
+    gitUrl = 'https://github.com/AdmitadSDK/android_sdk.git'
+
+    libraryVersion = '1.0'
+
+    developerId = 'fleps'
+    developerName = 'Bogdanov Philipp'
+    developerEmail = 'Flepsik@mail.ru'
+
+    licenseName = 'The MIT License (MIT)'
+    licenseUrl = 'https://github.com/AdmitadSDK/android_sdk/blob/master/README.md'
+    allLicenses = ["MIT"]
+}
+
 android {
     compileSdkVersion 26
 
@@ -24,15 +48,5 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
 }
 
-task deleteJar(type: Delete) {
-    delete 'libs/admitad_statistics_sdk.jar'
-}
-
-task createJar(type: Copy) {
-    from('build/intermediates/bundles/release/')
-    into('libs/jars/')
-    include('classes.jar')
-    rename('classes.jar', 'admitad_statistics_sdk.jar')
-}
-
-createJar.dependsOn(deleteJar, build)
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
