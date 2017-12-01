@@ -23,8 +23,6 @@ import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_RETURNED_USER
 
 public class NetworkRepositoryImpl implements NetworkRepository {
 
-    private static final String URL_ENCODE_TYPE = "UTF-8";
-
     private static final String TRACKING = "tracking";
     private static final String TAG = "AdmitadTracker";
 
@@ -55,12 +53,8 @@ public class NetworkRepositoryImpl implements NetworkRepository {
                     .append(HOST).append("/").append(PATH);
         }
 
-        String paramsPath = getUrlQuery(admitadEvent.params);
-        try {
-            paramsPath = URLEncoder.encode(paramsPath, URL_ENCODE_TYPE);
-        } catch (UnsupportedEncodingException pE) {
-            pE.printStackTrace();
-        }
+        String paramsPath = getUrlQuery(admitadEvent);
+        paramsPath = URLEncoder.encode(paramsPath);
 
         urlBuilder.append("?")
                 .append(paramsPath);
@@ -150,15 +144,20 @@ public class NetworkRepositoryImpl implements NetworkRepository {
         }
     }
 
-    private String getUrlQuery(final Map<String, String> params) {
+    private String getUrlQuery(final AdmitadEvent admitadEvent) {
         final StringBuilder queryBuilder = new StringBuilder();
-        for (final String key : params.keySet()) {
+        for (final String key : admitadEvent.params.keySet()) {
             if (queryBuilder.length() > 0) {
                 queryBuilder.append("&");
             }
             queryBuilder.append(key)
                     .append("=")
-                    .append(params.get(key));
+                    .append(admitadEvent.params.get(key));
+        }
+        if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
+            queryBuilder.append(TRACKING)
+                    .append("=")
+                    .append(getEventConstant(admitadEvent.type));
         }
         return queryBuilder.toString();
     }
