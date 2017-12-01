@@ -1,6 +1,5 @@
 package ru.tachos.admitadstatisticsdk;
 
-import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
@@ -9,9 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 import okhttp3.*;
 import okhttp3.Callback;
@@ -24,6 +22,9 @@ import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_REGISTRATION;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_RETURNED_USER;
 
 public class NetworkRepositoryImpl implements NetworkRepository {
+
+    private static final String URL_ENCODE_TYPE = "UTF-8";
+
     private static final String TRACKING = "tracking";
     private static final String TAG = "AdmitadTracker";
 
@@ -33,7 +34,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
 
     private static final String SCHEME_INSTALL = "https";
     private static final String HOST_INSTALL = "ad.admitad.com";
-    private static final String PATH_INSTALL= "r";
+    private static final String PATH_INSTALL = "r";
 
     private OkHttpClient okHttpClient;
     private Handler uiHandler;
@@ -45,32 +46,38 @@ public class NetworkRepositoryImpl implements NetworkRepository {
 
     @Override
     public void log(final AdmitadEvent admitadEvent, final TrackerListener trackerListener) {
-        HttpUrl.Builder httpUrlBuilder = new HttpUrl.Builder();
+        StringBuilder urlBuilder = new StringBuilder();
         if (admitadEvent.type == TYPE_FIRST_LAUNCH) {
-            httpUrlBuilder.scheme(SCHEME_INSTALL)
-                    .host(HOST_INSTALL)
-                    .addPathSegment(PATH_INSTALL);
+            urlBuilder.append(SCHEME_INSTALL).append("://")
+                    .append(HOST_INSTALL).append("/").append(PATH_INSTALL);
         } else {
-            httpUrlBuilder.scheme(SCHEME)
-                    .host(HOST)
-                    .addPathSegment(PATH);
+            urlBuilder.append(SCHEME).append("://")
+                    .append(HOST).append("/").append(PATH);
         }
-        for (String key : admitadEvent.params.keySet()) {
-            httpUrlBuilder.addQueryParameter(key, admitadEvent.params.get(key));
+
+        String paramsPath = getUrlQuery(admitadEvent.params);
+        try {
+            paramsPath = URLEncoder.encode(paramsPath, URL_ENCODE_TYPE);
+        } catch (UnsupportedEncodingException pE) {
+            pE.printStackTrace();
         }
-        if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
-            httpUrlBuilder.addQueryParameter(TRACKING, getEventConstant(admitadEvent.type));
-        }
-        HttpUrl httpUrl = httpUrlBuilder.build();
-        logConsole(httpUrl.toString());
-        Request okHttpRequest = new Request.Builder()
-                .url(httpUrl)
+
+        urlBuilder.append("?")
+                .append(paramsPath);
+
+        final String url = urlBuilder.toString();
+        logConsole(url);
+
+        final Request okHttpRequest = new Request.Builder()
+                .url(url)
                 .build();
         okHttpClient.newCall(okHttpRequest).enqueue(new Callback() {
+
             @Override
-            public void onFailure(Call call, final IOException e) {
+            public void onFailure(final Call call, final IOException e) {
                 logConsole("Exception: " + e.toString());
                 new Thread(new Runnable() {
+
                     @Override
                     public void run() {
                         int code = AdmitadTrackerCode.ERROR_GENERIC;
@@ -79,6 +86,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
                         }
                         final int finalCode = code;
                         uiHandler.post(new Runnable() {
+
                             @Override
                             public void run() {
                                 trackerListener.onFailure(finalCode, e.getMessage());
@@ -120,7 +128,6 @@ public class NetworkRepositoryImpl implements NetworkRepository {
         }
     }
 
-
     private String getEventConstant(@AdmitadEvent.Type int code) {
         switch (code) {
             case TYPE_REGISTRATION:
@@ -141,5 +148,18 @@ public class NetworkRepositoryImpl implements NetworkRepository {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, message);
         }
+    }
+
+    private String getUrlQuery(final Map<String, String> params) {
+        final StringBuilder queryBuilder = new StringBuilder();
+        for (final String key : params.keySet()) {
+            if (queryBuilder.length() > 0) {
+                queryBuilder.append("&");
+            }
+            queryBuilder.append(key)
+                    .append("=")
+                    .append(params.get(key));
+        }
+        return queryBuilder.toString();
     }
 }
