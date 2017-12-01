@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URLEncoder;
+import java.security.cert.CertPathValidatorException;
 import java.util.Map;
 
 import okhttp3.*;
@@ -22,6 +23,7 @@ import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_REGISTRATION;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_RETURNED_USER;
 
 public class NetworkRepositoryImpl implements NetworkRepository {
+    private static final String ENCODE = "UTF-8";
 
     private static final String TRACKING = "tracking";
     private static final String TAG = "AdmitadTracker";
@@ -53,11 +55,8 @@ public class NetworkRepositoryImpl implements NetworkRepository {
                     .append(HOST).append("/").append(PATH);
         }
 
-        String paramsPath = getUrlQuery(admitadEvent);
-        paramsPath = URLEncoder.encode(paramsPath);
-
         urlBuilder.append("?")
-                .append(paramsPath);
+                .append(getUrlQuery(admitadEvent));
 
         final String url = urlBuilder.toString();
         logConsole(url);
@@ -147,18 +146,24 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     private String getUrlQuery(final AdmitadEvent admitadEvent) {
         final StringBuilder queryBuilder = new StringBuilder();
         for (final String key : admitadEvent.params.keySet()) {
-            if (queryBuilder.length() > 0) {
-                queryBuilder.append("&");
-            }
-            queryBuilder.append(key)
-                    .append("=")
-                    .append(admitadEvent.params.get(key));
+            addParam(queryBuilder, key, admitadEvent.params.get(key), queryBuilder.length() == 0);
         }
         if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
-            queryBuilder.append(TRACKING)
-                    .append("=")
-                    .append(getEventConstant(admitadEvent.type));
+            addParam(queryBuilder, TRACKING, getEventConstant(admitadEvent.type), false);
         }
         return queryBuilder.toString();
+    }
+
+    private void addParam(final StringBuilder builder, final String key, final String value, final boolean firstParam) {
+        try {
+            if (!firstParam) {
+                builder.append("&");
+            }
+            builder.append(URLEncoder.encode(key, ENCODE))
+                    .append("=")
+                    .append(URLEncoder.encode(value, ENCODE));
+        } catch (UnsupportedEncodingException pE) {
+            pE.printStackTrace();
+        }
     }
 }
