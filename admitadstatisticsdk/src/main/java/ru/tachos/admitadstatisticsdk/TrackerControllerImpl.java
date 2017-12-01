@@ -24,7 +24,8 @@ import ru.tachos.admitadstatisticsdk.network_state.NetworkManager;
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
 
 final class TrackerControllerImpl implements TrackerController, NetworkManager.Listener {
-    private final static long TIME_TO_CHECK_SERVER = TimeUnit.MINUTES.toMillis(1);
+    private final static long TIME_TO_CHECK_SERVER = TimeUnit.MINUTES.toMillis(5);
+    private final static long TIME_TO_TRY_AGAIN = TimeUnit.MINUTES.toMillis(2);
 
     private final static String TAG = "AdmitadTracker";
     private final static String URI_KEY_ADMITAD_UID = "uid";
@@ -217,7 +218,8 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         if (!networkState.isOnline() && errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE) {
             errorCode = AdmitadTrackerCode.ERROR_NO_INTERNET;
         }
-        if (errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE) {
+        if (errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE
+                || (errorText != null && errorText.contains("CertPathValidatorException"))) {
             isServerUnavailable = true;
             onServerUnavailable();
         }
@@ -234,7 +236,13 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                 && errorCode != AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED
                 && errorCode != AdmitadTrackerCode.ERROR_SDK_POSTBACK_CODE_MISSED
                 && errorCode != AdmitadTrackerCode.ERROR_SDK_NOT_INITIALIZED) {
-            tryLog();
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    tryLog();
+                }
+            }, TIME_TO_TRY_AGAIN);
         }
     }
 
