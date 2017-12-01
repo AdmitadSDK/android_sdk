@@ -27,9 +27,9 @@ import ru.tachos.admitadstatisticsdk.network_state.NetworkManager;
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
 
 class Utils {
-    private final static String KEY_CACHED_GAID = "KEY_CACHED_GAID";
-    private final static String KEY_FIRST_START = "ADMITAD_TRACKER_KEY_FIRST_START";
-    private final static String KEY_ADMITAD_ID = "ADMITAD_ID";
+    private static final String KEY_CACHED_GAID = "KEY_CACHED_GAID";
+    private static final String KEY_FIRST_START = "ADMITAD_TRACKER_KEY_FIRST_START";
+    private static final String KEY_ADMITAD_ID = "ADMITAD_ID";
 
     static AdmitadEvent getDeviceInfo(Context context) {
         JSONObject jsonObject = new JSONObject();
@@ -117,7 +117,7 @@ class Utils {
 
     static boolean isFirstLaunch(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean isFirstStart = sharedPreferences.getBoolean(KEY_FIRST_START, false);
+        boolean isFirstStart = sharedPreferences.getBoolean(KEY_FIRST_START, true);
         if (isFirstStart) {
             sharedPreferences.edit().putBoolean(KEY_FIRST_START, false).apply();
         }
