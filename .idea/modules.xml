@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AdmitadStatistic.iml" filepath="$PROJECT_DIR$/AdmitadStatistic.iml" />
+      <module fileurl="file://D:\workspace\admitad_sdk_android\AdmitadStatistic.iml" filepath="D:\workspace\admitad_sdk_android\AdmitadStatistic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/admitad_sdk_android.iml" filepath="$PROJECT_DIR$/.idea/admitad_sdk_android.iml" />
       <module fileurl="file://$PROJECT_DIR$/admitadstatisticsdk/admitadstatisticsdk.iml" filepath="$PROJECT_DIR$/admitadstatisticsdk/admitadstatisticsdk.iml" />
+      <module fileurl="file://D:\workspace\admitad_sdk_android\admitadstatisticsdk\admitadstatisticsdk.iml" filepath="D:\workspace\admitad_sdk_android\admitadstatisticsdk\admitadstatisticsdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://D:\workspace\admitad_sdk_android\app\app.iml" filepath="D:\workspace\admitad_sdk_android\app\app.iml" />
     </modules>
   </component>
 </project>

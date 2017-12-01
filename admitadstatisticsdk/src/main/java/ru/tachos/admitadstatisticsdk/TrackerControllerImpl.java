@@ -221,6 +221,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         if (errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE
                 || (errorText != null && errorText.contains("CertPathValidatorException"))) {
             isServerUnavailable = true;
+            errorCode = AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE;
             onServerUnavailable();
         }
         if (admitadPair.second != null) {
