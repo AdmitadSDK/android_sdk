@@ -138,7 +138,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     }
 
     private void logConsole(String message) {
-        if (BuildConfig.DEBUG) {
+        if (Utils.sLogEnabled) {
             Log.d(TAG, message);
         }
     }

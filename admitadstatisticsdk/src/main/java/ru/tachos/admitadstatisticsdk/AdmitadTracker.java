@@ -114,6 +114,10 @@ public final class AdmitadTracker {
         controller.log(Utils.getDeviceInfo(context), null);
     }
 
+    public static void setLogEnabled(boolean isEnabled) {
+        Utils.sLogEnabled = isEnabled;
+    }
+
     @SuppressLint("StaticFieldLeak")
     private static AdmitadTracker instance;
 

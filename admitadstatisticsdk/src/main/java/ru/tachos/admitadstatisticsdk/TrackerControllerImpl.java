@@ -254,7 +254,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     private void logConsole(String message) {
-        if (BuildConfig.DEBUG) {
+        if (Utils.sLogEnabled) {
             Log.d(TAG, message);
         }
     }

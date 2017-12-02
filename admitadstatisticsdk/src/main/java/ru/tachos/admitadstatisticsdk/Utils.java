@@ -31,6 +31,8 @@ class Utils {
     private static final String KEY_FIRST_START = "ADMITAD_TRACKER_KEY_FIRST_START";
     private static final String KEY_ADMITAD_ID = "ADMITAD_ID";
 
+    public static boolean sLogEnabled;
+
     static AdmitadEvent getDeviceInfo(Context context) {
         JSONObject jsonObject = new JSONObject();
         try {
