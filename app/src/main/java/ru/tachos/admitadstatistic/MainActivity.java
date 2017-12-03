@@ -1,16 +1,19 @@
 package ru.tachos.admitadstatistic;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
 import ru.tachos.admitadstatisticsdk.AdmitadEvent;
 import ru.tachos.admitadstatisticsdk.AdmitadOrder;
 import ru.tachos.admitadstatisticsdk.AdmitadTracker;
+import ru.tachos.admitadstatisticsdk.AdmitadTrackerCode;
 import ru.tachos.admitadstatisticsdk.TrackerInitializationCallback;
 import ru.tachos.admitadstatisticsdk.TrackerListener;
 
@@ -20,10 +23,11 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AdmitadTracker.setLogEnabled(true);
         AdmitadTracker.initialize(getApplicationContext(), "TestAndroidPostback", new TrackerInitializationCallback() {
             @Override
             public void onInitializationSuccess() {
-                AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=TestUidAndroid"));
             }
 
             @Override
@@ -31,6 +35,19 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
 
             }
         });
+        AdmitadTracker.getInstance().addListener(this);
+
+        onNewIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+
+        if (intent.getData() != null) {
+            AdmitadTracker.getInstance().handleDeeplink(intent.getData());
+        }
     }
 
     @Override
@@ -40,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
 
     @Override
     public void onFailure(int errorCode, @Nullable String errorText) {
-
+        if (errorCode == AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED) {
+            AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=TestUidAndroid"));
+        }
     }
 
     public void registrationClick(View v) {
