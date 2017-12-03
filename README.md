@@ -121,7 +121,7 @@ To update SDK you have to be included in the [admitadsdk organization](https://b
   * Increase version name in the `build.gradle` 
   
   ```
-      libraryVersion = '1.3.6'
+  libraryVersion = '1.3.6'
   ```
   
   * Update developer's data in the same file
@@ -129,18 +129,18 @@ To update SDK you have to be included in the [admitadsdk organization](https://b
   * If you add some libraries to the dependencies, your have to add dependencies manually in the `publish.gradle`. You are welcome to find another way. 
   
   ```
-  dependencies {
-                    "dependency" {
-                        groupId "com.google.android.gms"
-                        artifactId "play-services-ads"
-                        version GOOGLE_VERSION
-                    }
-                    "dependency" {
-                        groupId "com.squareup.okhttp3"
-                        artifactId "okhttp"
-                        version OK_HTTP_VERSION
-                    }
-                }
+     dependencies {
+           "dependency" {
+                  groupId "com.google.android.gms"
+                  artifactId "play-services-ads"
+                  version GOOGLE_VERSION
+            }
+            "dependency" {
+                   groupId "com.squareup.okhttp3"
+                   artifactId "okhttp"
+                   version OK_HTTP_VERSION
+            }
+      }
    ```
    
    * In the terminal
