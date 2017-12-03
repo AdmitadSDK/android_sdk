@@ -116,7 +116,7 @@ To update SDK you have to be included in the [admitadsdk organization](https://b
   bintray.orgName=admitadsdk
   ```
   
-  * I'm not sure, but your public can should be added to organization
+  * I'm not sure, but your public key can should be added to organization
   
   * Increase version name in the `build.gradle` 
   
