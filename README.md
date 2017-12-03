@@ -104,7 +104,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * You can find examples of use here: https://github.com/AdmitadSDK/android_sdk/blob/master/app/src/main/java/ru/tachos/admitadstatistic/MainActivity.java 
   
-  * To enable logs you can call 
+  * To enable logs you can call any time, even if initialize is not called 
   
   ``` 
   AdmitadTracker.setLogEnabled(true);
