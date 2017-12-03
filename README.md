@@ -104,6 +104,12 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * You can find examples of use here: https://github.com/AdmitadSDK/android_sdk/blob/master/app/src/main/java/ru/tachos/admitadstatistic/MainActivity.java 
   
+  * To enable logs you can call any time, even if initialize is not called 
+  
+  ``` 
+  AdmitadTracker.setLogEnabled(true);
+  ```
+  
 ## Updating
 
 To update SDK you have to be included in the [admitadsdk organization](https://bintray.com/admitadsdk)
@@ -116,7 +122,7 @@ To update SDK you have to be included in the [admitadsdk organization](https://b
   bintray.orgName=admitadsdk
   ```
   
-  * I'm not sure, but your public key can should be added to organization
+  * Add your public key to organization keys
   
   * Increase version name in the `build.gradle` 
   
