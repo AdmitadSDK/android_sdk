@@ -45,7 +45,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   ```
   Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.parse("admitad_test://?uid=TextAndroidUidOutside");
+        Uri uri = Uri.parse("admitad://?uid=TextAndroidUidOutside");
         intent.setData(uri);
         startActivity(intent);
   ```
