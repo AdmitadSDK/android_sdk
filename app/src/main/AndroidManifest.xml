@@ -19,7 +19,7 @@
             </intent-filter>
 
             <intent-filter>
-                <data android:scheme="admitad_test"/>
+                <data android:scheme="admitad"/>
 
                 <action android:name="android.intent.action.VIEW"/>
 
