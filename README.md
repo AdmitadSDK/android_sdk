@@ -38,7 +38,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
         });
   ```
   
-  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. 
+  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called "uid" (e.g. `schema://host?uid=YOUR_UID`)
   
   ```
    AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=YOUR_UID"));
