@@ -24,9 +24,8 @@ import ru.tachos.admitadstatisticsdk.network_state.NetworkManager;
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
 
 final class TrackerControllerImpl implements TrackerController, NetworkManager.Listener {
-    private final static long TIME_TO_CHECK_SERVER = TimeUnit.SECONDS.toMillis(40);
-    private final static long TIME_TO_TRY_AGAIN = TimeUnit.SECONDS.toMillis(20);
-    private final static long TIME_TO_TRY_SEND_ON_INRETNET_AVAILABLE = TimeUnit.SECONDS.toMillis(10);
+    private final static long TIME_TO_CHECK_SERVER = TimeUnit.MINUTES.toMillis(5);
+    private final static long TIME_TO_TRY_AGAIN = TimeUnit.MINUTES.toMillis(2);
 
     private final static String TAG = "AdmitadTracker";
     private final static String URI_KEY_ADMITAD_UID = "uid";
