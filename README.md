@@ -4,7 +4,8 @@ Min SDK = 14
 
 ## Download 
 
-Add repository to the root gradle 
+Add repository to the root gradle:
+
 ```
 allprojects {
     repositories {
@@ -12,18 +13,21 @@ allprojects {
     }
 }
 ```
-And this to the project gradle
+
+And this to the project gradle:
+
 ```
 compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
         transitive = true
 }
 ```
+
 ## Usage
 
   * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. You have to pass context, postback key, callback (optional)
   
   ```
-   AdmitadTracker.initialize(getApplicationContext(), YOUR_ANDROID_POSTBACK, new TrackerInitializationCallback() {
+   AdmitadTracker.initialize(getApplicationContext(), YOUR_ANDROID_POSTBACK_KEY, new TrackerInitializationCallback() {
             @Override
             public void onInitializationSuccess() {
             }
@@ -34,23 +38,35 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
         });
   ```
   
-  * Admitad uid is required for sending logs. You can pass deeplink by method AdmitadTracker#handleDeeplink.
+  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. 
   
   ```
    AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=YOUR_UID"));
   ```
   
-  You can open example project this way: 
+  e.g.
   
   ```
-  Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.parse("admitad://?uid=TextAndroidUidOutside");
-        intent.setData(uri);
-        startActivity(intent);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      onNewIntent(getIntent());
+  }
+  
+  @Override
+  protected void onNewIntent(Intent intent) {
+      super.onNewIntent(intent);
+      setIntent(intent);
+        
+      if (intent.getData() != null) {
+          AdmitadTracker.getInstance().handleDeeplink(intent.getData());
+      }
+  }
   ```
   
-  * After you call AdmitadTracker#initialize, you can start logging even if sdk is still not initialized. For logging you can use methods AdmitadTracker#log*. For every log type there're different params you have to pass, callback is optional;
+  See more examples in the [test project](app/)
+  
+  * After you call AdmitadTracker#initialize, you can start logging even if sdk is not initialized. For logging you can use methods AdmitadTracker#log*. For every log type there're different params you have to pass, callback is optional;
   
   * To log purchase or order you have to create AdmitadOrder object using builder. e.g.:
   
@@ -73,7 +89,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
             }
 
             @Override
-            public void onFailure(int errorCode, @Nullable String errorText) {
+            public void onFailure(@AdmitadTrackerCode int errorCode, @Nullable String errorText) {
             }
         });
    ```
@@ -93,7 +109,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
         });
   ```
   
-  * Error code can be one of the AdmitadTrackedCode 
+  * Error code can be one of the AdmitadTrackedCode: 
   
   ```
   public @interface AdmitadTrackerCode {
@@ -110,62 +126,13 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   }
   ```
   
-  * You can find examples of use here: https://github.com/AdmitadSDK/android_sdk/blob/master/app/src/main/java/ru/tachos/admitadstatistic/MainActivity.java 
+  * You can find examples of use [here](app/src/main/java/ru/tachos/admitadstatistic/MainActivity.java)
   
-  * To enable logs you can call any time, even if initialize is not called 
+  * To enable logs you can call any time: 
   
   ``` 
   AdmitadTracker.setLogEnabled(true);
   ```
-  
-## Updating
-
-To update SDK you have to be included in the [admitadsdk organization](https://bintray.com/admitadsdk)
-
-  * add these fields to your `local.properties`
-  
-  ```
-  bintray.user=YOUR_USER_NAME
-  bintray.apikey=YOUR_API_KEY
-  bintray.orgName=admitadsdk
-  ```
-  
-  * Add your public key to organization keys
-  
-  * Increase version name in the `build.gradle` 
-  
-  ```
-  libraryVersion = '1.3.6'
-  ```
-  
-  * Update developer's data in the same file
-  
-  * If you add some libraries to the dependencies, your have to add dependencies manually in the `publish.gradle`. You are welcome to find another way. 
-  
-  ```
-     dependencies {
-           "dependency" {
-                  groupId "com.google.android.gms"
-                  artifactId "play-services-ads"
-                  version GOOGLE_VERSION
-            }
-            "dependency" {
-                   groupId "com.squareup.okhttp3"
-                   artifactId "okhttp"
-                   version OK_HTTP_VERSION
-            }
-      }
-   ```
-   
-   * In the terminal
-   
-   ```
-   gradlew install
-   ```
-   
-   ```
-   gradlew bintrayUpload
-   ```
 
 ## License (MIT)
 ```
