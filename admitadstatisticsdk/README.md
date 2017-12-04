@@ -1,31 +1,50 @@
-To add this lib to the project:
+## Updating
 
-1) Add jar to the app/libs
+To update SDK you have to be included in the [admitadsdk organization](https://bintray.com/admitadsdk)
 
-2) Click on jar and press "add as library"
-
-To generate jar:
-
-1) run createJar gradle task
-
-How to use SDK:
-
-1) SDK is being initialized async, so you must call AdmitadTracker#initialize before using. You have to pass context, postback key, callback (optional)
-
-2) Admitad uid is required for sending logs. You can pass deeplink by method AdmitadTracker#handleDeeplink
-
-3) After you call AdmitadTracker#initialize, you can start logging even if sdk is still not initialized. For logging you can use methods AdmitadTracker#log*.
-    For every log type there're different params you have to pass, callback is optional;
-
-4) To log purchase or order you have to create AdmitadOrder object using builder. e.g.:
-
-    final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
-                .setCurrencyCode("RUB")
-                .putItem(new AdmitadOrder.Item("Item1", "ItemName1", 3))
-                .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 5))
-                .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "Kek").putExtra("Age", "10"))
-                .build();
-
-5) To subscribe for specific event, you can pass callbacks to the log* method.
-
-6) To subscribe for all events, you can call method AdmitadTracker#addListener. This method will be always called on sending.
+  * add these fields to your `local.properties`
+  
+  ```
+  bintray.user=YOUR_USER_NAME
+  bintray.apikey=YOUR_API_KEY
+  bintray.orgName=admitadsdk
+  ```
+  
+  * Add your public key to organization keys
+  
+  * Generate your private key using [instruction: part 3](https://inthecheesefactory.com/blog/how-to-upload-library-to-jcenter-maven-central-as-dependency/en)
+  
+  * Increase version name in the `build.gradle` 
+  
+  ```
+  libraryVersion = '1.3.6'
+  ```
+  
+  * Update developer's data in the same file
+  
+  * If you add some libraries to the dependencies, your have to add dependencies manually in the `publish.gradle`. You are welcome to find another way. 
+  
+  ```
+     dependencies {
+           "dependency" {
+                  groupId "com.google.android.gms"
+                  artifactId "play-services-ads"
+                  version GOOGLE_VERSION
+            }
+            "dependency" {
+                   groupId "com.squareup.okhttp3"
+                   artifactId "okhttp"
+                   version OK_HTTP_VERSION
+            }
+      }
+   ```
+   
+   * In the terminal
+   
+   ```
+   gradlew install
+   ```
+   
+   ```
+   gradlew bintrayUpload
+   ```
