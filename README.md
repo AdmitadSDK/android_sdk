@@ -8,9 +8,7 @@ Add repository to the root gradle
 ```
 allprojects {
     repositories {
-        maven {
-            url "https://dl.bintray.com/admitadsdk/android_sdk"
-        }
+        jcenter()
     }
 }
 ```
