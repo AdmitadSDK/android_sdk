@@ -2,7 +2,7 @@
 
 To update SDK you have to be included in the [admitadsdk organization](https://bintray.com/admitadsdk)
 
-  * add these fields to your `local.properties`
+  * Add these fields to your `local.properties`:
   
   ```
   bintray.user=YOUR_USER_NAME
