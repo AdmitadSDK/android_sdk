@@ -24,7 +24,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
 
 ## Usage
 
-  * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. You have to pass context, postback key, callback (optional)
+  * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. You have to pass context, postback key (non-null key is mandatory, exception is thrown otherwise), callback (optional)
   
   ```
    AdmitadTracker.initialize(getApplicationContext(), YOUR_ANDROID_POSTBACK_KEY, new TrackerInitializationCallback() {
@@ -38,10 +38,10 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
         });
   ```
   
-  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called "uid" (e.g. `schema://host?uid=YOUR_UID`)
+  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called "uid" (e.g. `schema://host?admitad_uid=YOUR_UID`)
   
   ```
-   AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=YOUR_UID"));
+   AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?admitad_uid=YOUR_UID"));
   ```
   
   e.g.
