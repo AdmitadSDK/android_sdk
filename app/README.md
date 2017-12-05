@@ -9,7 +9,7 @@
    ```
     Intent intent = new Intent();
     intent.setAction(Intent.ACTION_VIEW);		          
-    Uri uri = Uri.parse("admitad://?uid=TextAndroidUidOutside");
+    Uri uri = Uri.parse("admitad://?admitad_uid=TextAndroidUidOutside");
     intent.setData(uri);
     startActivity(intent);
    ```
