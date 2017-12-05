@@ -49,6 +49,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                           DatabaseRepository databaseRepository,
                           NetworkRepository networkRepository,
                           @Nullable TrackerInitializationCallback callback) {
+        if (TextUtils.isEmpty(postbackKey)) {
+            throw new NullPointerException("Postback key must be non-null");
+        }
         this.context = context;
         this.postbackKey = postbackKey;
         this.databaseRepository = databaseRepository;
