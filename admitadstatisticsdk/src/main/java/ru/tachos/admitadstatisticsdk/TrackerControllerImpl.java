@@ -28,7 +28,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private final static long TIME_TO_TRY_AGAIN = TimeUnit.MINUTES.toMillis(2);
 
     private final static String TAG = "AdmitadTracker";
-    private final static String URI_KEY_ADMITAD_UID = "uid";
+    private final static String URI_KEY_ADMITAD_UID = "admitad_uid";
     private final DatabaseRepository databaseRepository;
     private final NetworkRepository networkRepository;
     private final Handler uiHandler;
@@ -71,9 +71,13 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     @Override
     public void log(AdmitadEvent event, @Nullable TrackerListener trackerListener) {
         logConsole("New event: " + event.toString());
-        databaseRepository.insertOrUpdate(event);
-        eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
-        tryLog();
+        if (TextUtils.isEmpty(admitadUid)) {
+
+        } else {
+            databaseRepository.insertOrUpdate(event);
+            eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
+            tryLog();
+        }
     }
 
     @Override
