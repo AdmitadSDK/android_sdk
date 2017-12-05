@@ -1,5 +1,6 @@
 package ru.tachos.admitadstatisticsdk;
 
+import android.content.Context;
 import android.net.Uri;
 
 interface TrackerController {
@@ -9,7 +10,9 @@ interface TrackerController {
 
     void log(AdmitadEvent event, TrackerListener trackerListener);
 
-    void handleDeeplink(Uri uri);
+    boolean handleDeeplink(Uri uri);
 
     String getAdmitadUid();
+
+    Context getContext();
 }

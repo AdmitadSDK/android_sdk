@@ -23,7 +23,11 @@ public final class AdmitadTracker {
     }
 
     public void handleDeeplink(@Nullable Uri uri) {
-        controller.handleDeeplink(uri);
+        if (controller.handleDeeplink(uri)) {
+            if (Utils.isFirstLaunch(controller.getContext())) {
+                trackFirstLaunch(controller.getContext());
+            }
+        }
     }
 
     public void logRegistration(String registrationId) {
@@ -89,24 +93,7 @@ public final class AdmitadTracker {
                 new Handler(),
                 new DatabaseRepositorySQLite(context),
                 new NetworkRepositoryImpl(),
-                new TrackerInitializationCallback() {
-                    @Override
-                    public void onInitializationSuccess() {
-                        if (Utils.isFirstLaunch(context)) {
-                            trackFirstLaunch(context);
-                        }
-                        if (callback != null) {
-                            callback.onInitializationSuccess();
-                        }
-                    }
-
-                    @Override
-                    public void onInitializationFailed(Exception exception) {
-                        if (callback != null) {
-                            callback.onInitializationFailed(exception);
-                        }
-                    }
-                }
+                callback
         );
     }
 

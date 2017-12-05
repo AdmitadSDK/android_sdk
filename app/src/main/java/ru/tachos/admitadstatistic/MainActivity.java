@@ -10,6 +10,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import java.util.UUID;
+
 import ru.tachos.admitadstatisticsdk.AdmitadEvent;
 import ru.tachos.admitadstatisticsdk.AdmitadOrder;
 import ru.tachos.admitadstatisticsdk.AdmitadTracker;
@@ -52,14 +54,12 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
 
     @Override
     public void onSuccess(AdmitadEvent result) {
-
+        logConsole("Event send successfully + " + result);
     }
 
     @Override
     public void onFailure(int errorCode, @Nullable String errorText) {
-        if (errorCode == AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED) {
-            AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=TestUidAndroid"));
-        }
+        logConsole("Event failed to send, code = " + errorCode + ",msg: " + errorText);
     }
 
     public void registrationClick(View v) {
@@ -76,12 +76,12 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
         AdmitadTracker.getInstance().logOrder(order, new TrackerListener() {
             @Override
             public void onSuccess(AdmitadEvent result) {
-
+                logConsole("Order event send successfully + " + result.toString());
             }
 
             @Override
             public void onFailure(int errorCode, @Nullable String errorText) {
-
+                logConsole("Order event failed to send, code = " + errorCode + ",msg: " + errorText);
             }
         });
     }
@@ -109,5 +109,13 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
             AdmitadTracker.getInstance().logRegistration("userRegistration" + i);
             AdmitadTracker.getInstance().logUserLoyalty("userLoyalty" + i, i);
         }
+    }
+
+    public void setupNewAdmitadUid(View v) {
+        AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?admitad_uid=" + UUID.randomUUID()));
+    }
+
+    private void logConsole(String message) {
+        Log.d("MainActivity", message);
     }
 }

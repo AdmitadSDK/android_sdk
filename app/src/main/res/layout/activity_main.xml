@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="ru.tachos.admitadstatistic.MainActivity">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="ru.tachos.admitadstatistic.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,21 +17,21 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="registrationClick"
-            android:text="registration" />
+            android:text="registration"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="orderClick"
-            android:text="order" />
+            android:text="order"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="purchaseClick"
-            android:text="purchase" />
+            android:text="purchase"/>
     </LinearLayout>
 
     <LinearLayout
@@ -41,21 +41,34 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:onClick="returnClick"
             android:layout_weight="1"
-            android:text="return" />
+            android:onClick="returnClick"
+            android:text="return"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="loyaltyClick"
-            android:text="loyalty" />
+            android:text="loyalty"/>
+
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="manyEventsQueue"
-            android:text="Add many to queue" />
+            android:text="Add many to queue"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="setupNewAdmitadUid"
+            android:text="setup new random admitad uid"/>
     </LinearLayout>
 </LinearLayout>

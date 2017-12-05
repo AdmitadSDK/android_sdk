@@ -24,6 +24,7 @@ import ru.tachos.admitadstatisticsdk.network_state.NetworkManager;
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
 
 final class TrackerControllerImpl implements TrackerController, NetworkManager.Listener {
+
     private final static long TIME_TO_CHECK_SERVER = TimeUnit.MINUTES.toMillis(5);
     private final static long TIME_TO_TRY_AGAIN = TimeUnit.MINUTES.toMillis(2);
 
@@ -70,10 +71,14 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
 
     @Override
     public void log(AdmitadEvent event, @Nullable TrackerListener trackerListener) {
-        logConsole("New event: " + event.toString());
-        if (TextUtils.isEmpty(admitadUid)) {
-
+        logConsole("New event: " + event);
+        if (TextUtils.isEmpty(admitadUid) && event.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
+            notifyLogFailed(AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED,
+                    "Admitad UID is missed, event will NOT be cached and send later",
+                    trackerListener
+            );
         } else {
+            fillRequiredParams(event);
             databaseRepository.insertOrUpdate(event);
             eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
             tryLog();
@@ -81,7 +86,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     @Override
-    public void handleDeeplink(Uri uri) {
+    public boolean handleDeeplink(Uri uri) {
         if (uri != null) {
             logConsole("Deeplink handled, uri = " + uri);
             for (String key : uri.getQueryParameterNames()) {
@@ -92,10 +97,12 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                         admitadUid = newUid;
                         Utils.cacheUid(context, newUid);
                         tryLog();
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
     @Override
@@ -113,6 +120,10 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         }
     }
 
+    public Context getContext() {
+        return context;
+    }
+
     private void initilize(@Nullable TrackerInitializationCallback callback) {
         NetworkManager networkManager = new NetworkManager(context);
         networkManager.addListener(this);
@@ -121,16 +132,10 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     private void tryLog() {
-        if (eventQueue.size() > 0 && !isBusy) {
+        if (!eventQueue.isEmpty() && !isBusy) {
             int errorCode = AdmitadTrackerCode.NONE;
             if (!isInitialized) {
                 errorCode = AdmitadTrackerCode.ERROR_SDK_NOT_INITIALIZED;
-            }
-            if (TextUtils.isEmpty(postbackKey)) {
-                errorCode = AdmitadTrackerCode.ERROR_SDK_POSTBACK_CODE_MISSED;
-            }
-            if (TextUtils.isEmpty(admitadUid)) {
-                errorCode = AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED;
             }
             if (TextUtils.isEmpty(gaid)) {
                 errorCode = AdmitadTrackerCode.ERROR_SDK_GAID_MISSED;
@@ -148,7 +153,8 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
             if (errorCode == AdmitadTrackerCode.NONE) {
                 logConsole("Trying to send " + admitadEvent.toString());
                 isBusy = true;
-                networkRepository.log(fillRequiredParams(admitadEvent), new NetworkLogCallback(admitadPair));
+                admitadEvent.params.put("device", gaid);
+                networkRepository.log(admitadEvent, new NetworkLogCallback(admitadPair));
             } else {
                 onLogFailed(admitadPair, errorCode, "");
             }
@@ -158,7 +164,6 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private AdmitadEvent fillRequiredParams(AdmitadEvent admitadEvent) {
         admitadEvent.params.put("pk", postbackKey);
         admitadEvent.params.put("uid", admitadUid);
-        admitadEvent.params.put("device", gaid);
         return admitadEvent;
     }
 
@@ -185,9 +190,11 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         uiHandler.removeCallbacksAndMessages(null);
 
         uiHandler.postDelayed(new Runnable() {
+
             @Override
             public void run() {
                 new Thread(new Runnable() {
+
                     @Override
                     public void run() {
                         logConsole("Try to check if server available");
@@ -207,19 +214,17 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private void onLogSuccess(Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair) {
         logConsole("log success " + admitadPair.first.toString());
         isBusy = false;
+        TrackerListener trackerListener = null;
         if (admitadPair.second != null) {
-            TrackerListener trackerListener = admitadPair.second.get();
-            if (trackerListener != null) {
-                trackerListener.onSuccess(admitadPair.first);
-            }
+            trackerListener = admitadPair.second.get();
         }
-        notifyLogSuccess(admitadPair.first);
+        notifyLogSuccess(admitadPair.first, trackerListener);
         databaseRepository.remove(admitadPair.first.id);
         eventQueue.remove(admitadPair);
         tryLog();
     }
 
-    private void onLogFailed(Pair<AdmitadEvent,  WeakReference<TrackerListener>> admitadPair, int errorCode, @Nullable String errorText) {
+    private void onLogFailed(Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair, int errorCode, @Nullable String errorText) {
         logConsole("Log failed, errorCode = " + errorCode + ", text = " + errorText);
         isBusy = false;
         if (!networkState.isOnline() && errorCode == AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE) {
@@ -229,18 +234,14 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
             isServerUnavailable = true;
             onServerUnavailable();
         }
+        TrackerListener trackerListener = null;
         if (admitadPair.second != null) {
-            TrackerListener trackerListener = admitadPair.second.get();
-            if (trackerListener != null) {
-                trackerListener.onFailure(errorCode, errorText);
-            }
+            trackerListener = admitadPair.second.get();
         }
-        notifyLogFailed(errorCode, errorText);
+        notifyLogFailed(errorCode, errorText, trackerListener);
         if (errorCode != AdmitadTrackerCode.ERROR_SERVER_UNAVAILABLE
                 && errorCode != AdmitadTrackerCode.ERROR_NO_INTERNET
                 && errorCode != AdmitadTrackerCode.ERROR_SDK_GAID_MISSED
-                && errorCode != AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED
-                && errorCode != AdmitadTrackerCode.ERROR_SDK_POSTBACK_CODE_MISSED
                 && errorCode != AdmitadTrackerCode.ERROR_SDK_NOT_INITIALIZED) {
             new Handler().postDelayed(new Runnable() {
 
@@ -252,13 +253,21 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         }
     }
 
-    private void notifyLogSuccess(AdmitadEvent event) {
+    private void notifyLogSuccess(AdmitadEvent event, @Nullable TrackerListener trackerListener) {
+        if (trackerListener != null) {
+            trackerListener.onSuccess(event);
+        }
+
         for (TrackerListener listener : listeners) {
             listener.onSuccess(event);
         }
     }
 
-    private void notifyLogFailed(int errorCode, @Nullable String errorText) {
+    private void notifyLogFailed(int errorCode, @Nullable String errorText, @Nullable TrackerListener trackerListener) {
+        if (trackerListener != null) {
+            trackerListener.onFailure(errorCode, errorText);
+        }
+
         for (TrackerListener listener : listeners) {
             listener.onFailure(errorCode, errorText);
         }
@@ -271,9 +280,10 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     private class NetworkLogCallback implements TrackerListener {
+
         private final Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair;
 
-        private NetworkLogCallback(@NonNull Pair<AdmitadEvent,  WeakReference<TrackerListener>> admitadPair) {
+        private NetworkLogCallback(@NonNull Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair) {
             this.admitadPair = admitadPair;
         }
 
@@ -290,6 +300,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
 
     @SuppressLint("StaticFieldLeak")
     private class InitializationAsynctask extends AsyncTask<Void, Void, GaidAsyncTaskResult> {
+
         @Nullable
         TrackerInitializationCallback callback;
 
@@ -340,6 +351,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     private static class GaidAsyncTaskResult {
+
         private String gaid;
         private Exception exception;
     }
