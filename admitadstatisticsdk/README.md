@@ -16,7 +16,7 @@ To update SDK you have to be included in the [admitadsdk organization](https://b
   
   * Increase version name in the `build.gradle` 
   
-  ```
+  ```gradle
   libraryVersion = '1.3.6'
   ```
   
@@ -24,7 +24,7 @@ To update SDK you have to be included in the [admitadsdk organization](https://b
   
   * If you add some libraries to the dependencies, your have to add dependencies manually in the `publish.gradle`. You are welcome to find another way. 
   
-  ```
+  ```gradle
      dependencies {
            "dependency" {
                   groupId "com.google.android.gms"
@@ -41,10 +41,10 @@ To update SDK you have to be included in the [admitadsdk organization](https://b
    
    * In the terminal
    
-   ```
+   ```bash
    gradlew install
    ```
    
-   ```
+   ```bash
    gradlew bintrayUpload
    ```
