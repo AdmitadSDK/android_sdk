@@ -1,12 +1,27 @@
 # Admitad SDK for Android
 
-Min SDK = 14
+## Table of contents
 
-## Download 
+* [Example app](#example-app)
+* [Basic integration](#basic-integration)
+    * [Add the SDK to your project](#sdk-add)
+    * [Usage](#sdk-usage)
+* [License](#license)   
+
+## <a id="example-app"></a>Example app
+
+You can find examples of use [in this directory](app/src/main/java/ru/tachos/admitadstatistic/MainActivity.java).
+You can open the Android project to see an example on how the admitad SDK can be integrated.
+
+## <a id="basic-integration"></a>Basic integration
+
+These are the minimal steps required to integrate the admitad SDK into your Android project. We are going to assume that you use Android Studio for your Android development and target an Android API level 14 (Ice Cream Sandwich) or later.
+
+### <a id="sdk-add"></a>Add the SDK to your project
 
 Add repository to the root gradle:
 
-```
+```gradle
 allprojects {
     repositories {
         jcenter()
@@ -16,17 +31,17 @@ allprojects {
 
 And this to the project gradle:
 
-```
+```gradle
 compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
         transitive = true
 }
 ```
 
-## Usage
+### <a id="sdk-usage"></a>Usage
 
   * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. You have to pass context, postback key (non-null key is mandatory, exception is thrown otherwise), callback (optional)
   
-  ``` java
+  ```java
    AdmitadTracker.initialize(getApplicationContext(), YOUR_ANDROID_POSTBACK_KEY, new TrackerInitializationCallback() {
             @Override
             public void onInitializationSuccess() {
@@ -40,13 +55,13 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called "uid" (e.g. `schema://host?admitad_uid=YOUR_UID`)
   
-  ``` java
+  ```java
    AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?admitad_uid=YOUR_UID"));
   ```
   
   e.g.
   
-  ``` java
+  ```java
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -70,7 +85,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * To log purchase or order you have to create AdmitadOrder object using builder. e.g.:
   
-  ``` java
+  ```java
     final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
                 .setCurrencyCode("RUB")
                 .putItem(new AdmitadOrder.Item("Item1", "ItemName1", 300))
@@ -81,7 +96,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
 
    * To subscribe for specific event, you can pass callbacks to the log* method.
    
-  ``` java
+  ```java
      AdmitadTracker.getInstance().logRegistration("TestRegistrationUid", new TrackerListener() {
 
             @Override
@@ -96,7 +111,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
 
   * To subscribe for all events, you can call method AdmitadTracker#addListener. This method will be always called on sending.
 
-  ``` java
+  ```java
    AdmitadTracker.getInstance().addListener(new TrackerListener() {
 
             @Override
@@ -111,7 +126,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * Error code can be one of the AdmitadTrackedCode: 
   
-  ``` java
+  ```java
   public @interface AdmitadTrackerCode {
     int NONE = 0;
     int SUCCESS = 200;
@@ -126,11 +141,11 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   }
   ```
   
-  * You can find examples of use [here](app/src/main/java/ru/tachos/admitadstatistic/MainActivity.java)
+
   
   * To enable logs you can call any time: 
   
-  ```  java
+  ``` java
   AdmitadTracker.setLogEnabled(true);
   ```
 
