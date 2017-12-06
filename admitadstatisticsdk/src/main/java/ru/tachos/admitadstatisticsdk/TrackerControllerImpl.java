@@ -163,7 +163,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
 
     private AdmitadEvent fillRequiredParams(AdmitadEvent admitadEvent) {
         admitadEvent.params.put("pk", postbackKey);
-        admitadEvent.params.put("uid", admitadUid);
+        if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
+            admitadEvent.params.put("uid", admitadUid);
+        }
         return admitadEvent;
     }
 

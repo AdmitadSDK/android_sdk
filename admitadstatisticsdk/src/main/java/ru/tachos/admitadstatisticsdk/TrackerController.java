@@ -10,6 +10,7 @@ interface TrackerController {
 
     void log(AdmitadEvent event, TrackerListener trackerListener);
 
+    //Returns true if uid handled
     boolean handleDeeplink(Uri uri);
 
     String getAdmitadUid();
