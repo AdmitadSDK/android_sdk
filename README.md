@@ -26,7 +26,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
 
   * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. You have to pass context, postback key (non-null key is mandatory, exception is thrown otherwise), callback (optional)
   
-  ```
+  ``` java
    AdmitadTracker.initialize(getApplicationContext(), YOUR_ANDROID_POSTBACK_KEY, new TrackerInitializationCallback() {
             @Override
             public void onInitializationSuccess() {
@@ -40,13 +40,13 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called "uid" (e.g. `schema://host?admitad_uid=YOUR_UID`)
   
-  ```
+  ``` java
    AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?admitad_uid=YOUR_UID"));
   ```
   
   e.g.
   
-  ```
+  ``` java
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -70,7 +70,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * To log purchase or order you have to create AdmitadOrder object using builder. e.g.:
   
-  ```
+  ``` java
     final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
                 .setCurrencyCode("RUB")
                 .putItem(new AdmitadOrder.Item("Item1", "ItemName1", 300))
@@ -81,7 +81,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
 
    * To subscribe for specific event, you can pass callbacks to the log* method.
    
-  ```
+  ``` java
      AdmitadTracker.getInstance().logRegistration("TestRegistrationUid", new TrackerListener() {
 
             @Override
@@ -96,7 +96,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
 
   * To subscribe for all events, you can call method AdmitadTracker#addListener. This method will be always called on sending.
 
-  ```
+  ``` java
    AdmitadTracker.getInstance().addListener(new TrackerListener() {
 
             @Override
@@ -111,7 +111,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * Error code can be one of the AdmitadTrackedCode: 
   
-  ```
+  ``` java
   public @interface AdmitadTrackerCode {
     int NONE = 0;
     int SUCCESS = 200;
@@ -130,7 +130,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
   
   * To enable logs you can call any time: 
   
-  ``` 
+  ```  java
   AdmitadTracker.setLogEnabled(true);
   ```
 
