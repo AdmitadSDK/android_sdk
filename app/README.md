@@ -6,7 +6,7 @@
   
   MainActivity is able to handle intent with `admitad` scheme and pass it to the SDK: 
   
-   ```
+   ```java
     Intent intent = new Intent();
     intent.setAction(Intent.ACTION_VIEW);		          
     Uri uri = Uri.parse("admitad://?admitad_uid=TextAndroidUidOutside");
