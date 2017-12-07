@@ -25,11 +25,29 @@ Add repository to the root gradle:
 allprojects {
     repositories {
         jcenter()
+        google()
     }
 }
 ```
 
-And this to the project gradle:
+old version:
+
+```gradle
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://maven.google.com" }
+    }
+}
+```
+
+And this to the project's gradle:
+
+```gradle
+ implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0'
+```
+   
+old version:
 
 ```gradle
 compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
