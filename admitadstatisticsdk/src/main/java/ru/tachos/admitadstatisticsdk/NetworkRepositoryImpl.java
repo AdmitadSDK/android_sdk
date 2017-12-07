@@ -1,13 +1,19 @@
 package ru.tachos.admitadstatisticsdk;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.CertPathValidatorException;
 import java.util.Map;
@@ -28,7 +34,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     private static final String TRACKING = "tracking";
     private static final String TAG = "AdmitadTracker";
 
-    private static final String SCHEME = "https";
+    private static final String SCHEME = "https://";
     private static final String HOST = "ad.admitad.com";
     private static final String PATH = "r";
 
@@ -51,7 +57,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
             urlBuilder.append(SCHEME_INSTALL).append("://")
                     .append(HOST_INSTALL).append("/").append(PATH_INSTALL);
         } else {
-            urlBuilder.append(SCHEME).append("://")
+            urlBuilder.append(SCHEME)
                     .append(HOST).append("/").append(PATH);
         }
 
@@ -103,22 +109,21 @@ public class NetworkRepositoryImpl implements NetworkRepository {
 
     @Override
     public boolean isServerAvailable() {
-        final Socket socket = new Socket();
-        try {
-            final InetAddress inetAddress = InetAddress.getByName(HOST);
-            final InetSocketAddress inetSocketAddress = new InetSocketAddress(inetAddress, 80);
-
-            socket.connect(inetSocketAddress, 5000);
-            return true;
-        } catch (java.io.IOException e) {
-            return false;
-        } finally {
             try {
-                socket.close();
+                final URL url = new URL(SCHEME + HOST);
+                final HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+                urlc.setConnectTimeout(10 * 1000);
+                urlc.connect();
+                if (urlc.getResponseCode() == 200) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (MalformedURLException e1) {
+                return false;
             } catch (IOException e) {
-                e.printStackTrace();
+                return false;
             }
-        }
     }
 
     private String getEventConstant(@AdmitadEvent.Type int code) {
