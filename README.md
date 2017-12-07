@@ -32,7 +32,7 @@ allprojects {
 And this to the project gradle:
 
 ```gradle
-compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.3.5') {
+compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
         transitive = true
 }
 ```
