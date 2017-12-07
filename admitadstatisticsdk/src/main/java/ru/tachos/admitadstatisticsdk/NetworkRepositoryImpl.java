@@ -38,7 +38,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     private static final String HOST = "ad.admitad.com";
     private static final String PATH = "r";
 
-    private static final String SCHEME_INSTALL = "https";
+    private static final String SCHEME_INSTALL = "https://";
     private static final String HOST_INSTALL = "ad.admitad.com";
     private static final String PATH_INSTALL = "r";
 
@@ -54,7 +54,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     public void log(final AdmitadEvent admitadEvent, final TrackerListener trackerListener) {
         StringBuilder urlBuilder = new StringBuilder();
         if (admitadEvent.type == TYPE_FIRST_LAUNCH) {
-            urlBuilder.append(SCHEME_INSTALL).append("://")
+            urlBuilder.append(SCHEME_INSTALL)
                     .append(HOST_INSTALL).append("/").append(PATH_INSTALL);
         } else {
             urlBuilder.append(SCHEME)
