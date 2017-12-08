@@ -57,7 +57,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
 
 ### <a id="sdk-usage"></a>Usage
 
-  * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. You have to pass context, postback key (non-null key is mandatory, exception is thrown otherwise), callback (optional)
+  * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. We'd like to reccomend to initialize in the `Application#OnCreate` or in the launcher Activity in `Activity#onCreate`. You have to pass context, postback key (non-null key is mandatory, exception is thrown otherwise), callback (optional)
   
   ```java
    AdmitadTracker.initialize(getApplicationContext(), YOUR_ANDROID_POSTBACK_KEY, new TrackerInitializationCallback() {
@@ -71,13 +71,13 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
         });
   ```
   
-  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called "uid" (e.g. `schema://host?admitad_uid=YOUR_UID`)
+  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called `admitad_uid` (e.g. `schema://host?admitad_uid=YOUR_UID`). If SDK has no UID then no logs will be sent.
   
   ```java
    AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?admitad_uid=YOUR_UID"));
   ```
   
-  e.g.
+  Example of handling deeplink:
   
   ```java
   @Override
@@ -99,9 +99,27 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
   
   See more examples in the [test project](app/)
   
-  * After you call AdmitadTracker#initialize, you can start logging even if sdk is not initialized. For logging you can use methods AdmitadTracker#log*. For every log type there're different params you have to pass, callback is optional;
+  * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, logs will be stored and send ASAP. There're several events sdk is able to log:
   
-  * To log purchase or order you have to create AdmitadOrder object using builder. e.g.:
+      * #### Registration 
+      
+      ```java
+      AdmitadTracker.getInstance().logRegistration(*USER_ID*);
+      ```
+      
+      * #### Returned user
+      
+      ```java
+      AdmitadTracker.getInstance().logUserReturn(*USER_ID*, *DAY_COUNT*);
+      ```
+
+      * #### Loyalty
+      
+      ```java
+      AdmitadTracker.getInstance().logUserLoyalty(*USER_ID*, *OPEN_APP_COUNT*);
+      ```
+  
+  * To log confirmed purchase or paid order you have to create AdmitadOrder object using builder. e.g.:
   
   ```java
     final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
@@ -111,33 +129,51 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
                 .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "UserSurname").putExtra("Age", "18"))
                 .build();
   ```
+  
+  And then you can log using `order`:
+  
+     * #### Paid order
+     
+      ```java
+      AdmitadTracker.getInstance().logOrder(order);
+      ```
+      
+      * #### Confirmed purchase
+      
+      ```java
+      AdmitadTracker.getInstance().logPurchase(order);
+      ```
 
-   * To subscribe for specific event, you can pass callbacks to the log* method.
+   * To subscribe for specific event, you can pass callbacks to any log* method, e.g.: 
    
   ```java
-     AdmitadTracker.getInstance().logRegistration("TestRegistrationUid", new TrackerListener() {
+     AdmitadTracker.getInstance().logRegistration(*USER_ID*, new TrackerListener() {
 
             @Override
             public void onSuccess(AdmitadEvent result) {
+                 Log.d("AdmitadTracker", "Registration event sent successfully + " + result.toString());
             }
 
             @Override
             public void onFailure(@AdmitadTrackerCode int errorCode, @Nullable String errorText) {
+                 Log.d("AdmitadTracker", "Failed to send registration event: errorCode = " + errorCode + ", errorText = " + errorText);
             }
         });
    ```
 
-  * To subscribe for all events, you can call method AdmitadTracker#addListener. This method will be always called on sending.
+  * To subscribe for all events, you can call method `AdmitadTracker#addListener`. This method will be always called on sending.
 
   ```java
    AdmitadTracker.getInstance().addListener(new TrackerListener() {
 
             @Override
             public void onSuccess(AdmitadEvent result) {
+                Log.d("AdmitadTracker", "Event sent successfully + " + result.toString());
             }
 
             @Override
             public void onFailure(@AdmitadTrackerCode int errorCode, @Nullable String errorText) {
+                Log.d("AdmitadTracker", "Failed to send event: errorCode = " + errorCode + ", errorText = " + errorText);
             }
         });
   ```
@@ -158,8 +194,6 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
     int ERROR_SDK_ADMITAD_UID_MISSED = -1300;
   }
   ```
-  
-
   
   * To enable logs you can call any time: 
   
