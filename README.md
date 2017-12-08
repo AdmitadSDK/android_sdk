@@ -130,14 +130,14 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.0') {
                 .build();
   ```
   
-  And then you can log using `order`:
+  * Then you can log using `order`:
   
-     * #### Paid order
-     
+      * #### Paid order
+      
       ```java
       AdmitadTracker.getInstance().logOrder(order);
       ```
-      
+
       * #### Confirmed purchase
       
       ```java
