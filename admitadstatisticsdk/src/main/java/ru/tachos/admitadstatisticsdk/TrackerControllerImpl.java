@@ -29,7 +29,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private final static long TIME_TO_TRY_AGAIN = TimeUnit.MINUTES.toMillis(2);
 
     private final static String TAG = "AdmitadTracker";
-    private final static String URI_KEY_ADMITAD_UID = "admitad_uid";
+    private final static String URI_KEY_ADMITAD_UID = "uid";
     private final DatabaseRepository databaseRepository;
     private final NetworkRepository networkRepository;
     private final Handler uiHandler;
