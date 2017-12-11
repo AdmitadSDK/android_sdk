@@ -14,8 +14,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 class DatabaseRepositorySQLite implements DatabaseRepository {
+
     private TrackerDatabaseHelper dbHelper;
     private final static String[] projection = {
             AdmitadTrackerContract.TrackEntry._ID,
@@ -23,7 +27,7 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
             AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS
     };
     private final static String sortOrder = AdmitadTrackerContract.TrackEntry._ID + " ASC";
-
+    private Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public DatabaseRepositorySQLite(Context context) {
         dbHelper = new TrackerDatabaseHelper(context);
@@ -31,21 +35,23 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
 
     @Override
     public void insertOrUpdate(final AdmitadEvent event) {
-        new Thread(new Runnable() {
+        executor.execute(new Runnable() {
+
             @Override
             public void run() {
-                SQLiteDatabase database = dbHelper.getWritableDatabase();
+                final SQLiteDatabase database = dbHelper.getWritableDatabase();
                 database.beginTransaction();
                 event.id = database.insertWithOnConflict(AdmitadTrackerContract.TrackEntry.TABLE_NAME, null, parse(event), SQLiteDatabase.CONFLICT_REPLACE);
                 database.setTransactionSuccessful();
                 database.endTransaction();
             }
-        }).start();
+        });
     }
 
     @Override
     public void remove(final long id) {
-        new Thread(new Runnable() {
+        executor.execute(new Runnable() {
+
             @Override
             public void run() {
                 SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -56,7 +62,7 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
                 database.setTransactionSuccessful();
                 database.endTransaction();
             }
-        }).start();
+        });
     }
 
     @Override
@@ -82,10 +88,12 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
     public void findAllAsync(final Callback<List<AdmitadEvent>> trackerListener) {
         final Handler uiHandler = new Handler();
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 final List<AdmitadEvent> events = findAll();
                 uiHandler.post(new Runnable() {
+
                     @Override
                     public void run() {
                         trackerListener.onSuccess(events);
@@ -96,12 +104,13 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
     }
 
     public static ContentValues parse(AdmitadEvent event) {
-        ContentValues contentValues = new ContentValues();
+        final ContentValues contentValues = new ContentValues();
         if (event.id > 0) {
             contentValues.put(AdmitadTrackerContract.TrackEntry._ID, event.id);
         }
+        final Map<String, String> params = new HashMap<>(event.params);
         contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_TYPE, event.type);
-        contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS, new JSONObject(event.params).toString());
+        contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS, new JSONObject(params).toString());
         return contentValues;
     }
 

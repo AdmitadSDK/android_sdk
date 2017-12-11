@@ -14,6 +14,8 @@ import android.util.Pair;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +60,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         this.databaseRepository = databaseRepository;
         this.networkRepository = networkRepository;
         this.uiHandler = uiHandler;
+        Collections.synchronizedList(eventQueue);
         initilize(callback);
     }
 
@@ -314,8 +317,8 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         protected GaidAsyncTaskResult doInBackground(Void... voids) {
             GaidAsyncTaskResult result = new GaidAsyncTaskResult();
             isServerUnavailable = !networkRepository.isServerAvailable();
-            for (AdmitadEvent admitadEvent : databaseRepository.findAll()) {
-                eventQueue.add(new Pair<AdmitadEvent, WeakReference<TrackerListener>>(admitadEvent, null));
+            for (final AdmitadEvent admitadEvent : databaseRepository.findAll()) {
+                result.events.add(new Pair<AdmitadEvent, WeakReference<TrackerListener>>(admitadEvent, null));
             }
             result.gaid = Utils.getCachedGAID(context);
             admitadUid = Utils.getAdmitadUid(context);
@@ -344,6 +347,8 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                 logConsole("Initialize success, gaid = " + gaid + ", uid = " + admitadUid + ", key = " + postbackKey + ", server availability " + !isServerUnavailable);
             }
 
+            eventQueue.addAll(result.events);
+
             if (isServerUnavailable) {
                 onServerUnavailable();
             } else {
@@ -355,6 +360,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private static class GaidAsyncTaskResult {
 
         private String gaid;
+        private List<Pair<AdmitadEvent, WeakReference<TrackerListener>>> events = new ArrayList<>();
         private Exception exception;
     }
 }

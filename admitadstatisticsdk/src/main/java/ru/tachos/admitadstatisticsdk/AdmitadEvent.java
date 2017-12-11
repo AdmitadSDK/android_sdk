@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class AdmitadEvent {
     public String toString() {
         return "AdmitadEvent{" +
                 "type=" + typeToString(type) +
-                ", params=" + params +
+                ", params=" + new HashMap<>(params) +
                 '}';
     }
 
