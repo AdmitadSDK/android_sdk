@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
     }
 
     public void setupNewAdmitadUid(View v) {
-        AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?admitad_uid=" + UUID.randomUUID()));
+        AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=" + UUID.randomUUID()));
     }
 
     private void logConsole(String message) {
