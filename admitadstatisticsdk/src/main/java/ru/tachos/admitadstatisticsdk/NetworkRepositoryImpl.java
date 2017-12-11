@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.CertPathValidatorException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.*;
 import okhttp3.Callback;
@@ -29,6 +30,8 @@ import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_REGISTRATION;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_RETURNED_USER;
 
 public class NetworkRepositoryImpl implements NetworkRepository {
+    private static final int TIME_OUT = 20; //seconds
+
     private static final String ENCODE = "UTF-8";
 
     private static final String TRACKING = "tracking";
@@ -46,7 +49,11 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     private Handler uiHandler;
 
     public NetworkRepositoryImpl() {
-        okHttpClient = new OkHttpClient();
+        okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
+                .readTimeout(TIME_OUT, TimeUnit.SECONDS)
+                .writeTimeout(TIME_OUT, TimeUnit.SECONDS)
+                .build();
         uiHandler = new Handler();
     }
 
@@ -112,7 +119,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
             try {
                 final URL url = new URL(SCHEME + HOST);
                 final HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
-                urlc.setConnectTimeout(10 * 1000);
+                urlc.setConnectTimeout(TIME_OUT * 1000);
                 urlc.connect();
                 if (urlc.getResponseCode() == 200) {
                     return true;

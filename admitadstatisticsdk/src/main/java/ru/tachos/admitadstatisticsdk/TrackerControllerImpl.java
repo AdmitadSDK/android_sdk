@@ -225,7 +225,11 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         }
         notifyLogSuccess(admitadPair.first, trackerListener);
         databaseRepository.remove(admitadPair.first.id);
-        eventQueue.remove(admitadPair);
+        if (!eventQueue.isEmpty() && eventQueue.get(eventQueue.size() - 1) == admitadPair) {
+            eventQueue.remove(eventQueue.size() - 1);
+        } else {
+            eventQueue.remove(admitadPair);
+        }
         tryLog();
     }
 
@@ -318,7 +322,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
             GaidAsyncTaskResult result = new GaidAsyncTaskResult();
             isServerUnavailable = !networkRepository.isServerAvailable();
             for (final AdmitadEvent admitadEvent : databaseRepository.findAll()) {
-                result.events.add(new Pair<AdmitadEvent, WeakReference<TrackerListener>>(admitadEvent, null));
+                result.events.add(0, new Pair<AdmitadEvent, WeakReference<TrackerListener>>(admitadEvent, null));
             }
             result.gaid = Utils.getCachedGAID(context);
             admitadUid = Utils.getAdmitadUid(context);
@@ -347,7 +351,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                 logConsole("Initialize success, gaid = " + gaid + ", uid = " + admitadUid + ", key = " + postbackKey + ", server availability " + !isServerUnavailable);
             }
 
-            eventQueue.addAll(result.events);
+            eventQueue.addAll(0, result.events);
 
             if (isServerUnavailable) {
                 onServerUnavailable();
@@ -360,7 +364,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private static class GaidAsyncTaskResult {
 
         private String gaid;
-        private List<Pair<AdmitadEvent, WeakReference<TrackerListener>>> events = new ArrayList<>();
+        private List<Pair<AdmitadEvent, WeakReference<TrackerListener>>> events = new LinkedList<>();
         private Exception exception;
     }
 }
