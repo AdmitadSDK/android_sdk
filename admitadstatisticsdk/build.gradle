@@ -16,7 +16,7 @@ ext {
     siteUrl = 'https://github.com/AdmitadSDK/android_sdk'
     gitUrl = 'https://github.com/AdmitadSDK/android_sdk.git'
 
-    libraryVersion = '1.4.4'
+    libraryVersion = '1.4.5'
 
     developerId = 'fleps'
     developerName = 'Bogdanov Philipp'
