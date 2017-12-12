@@ -83,7 +83,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         } else {
             fillRequiredParams(event);
             databaseRepository.insertOrUpdate(event);
-            eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
+            synchronized (eventQueue) {
+                eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
+            }
             tryLog();
         }
     }
@@ -165,9 +167,11 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     private AdmitadEvent fillRequiredParams(AdmitadEvent admitadEvent) {
-        admitadEvent.params.put("pk", postbackKey);
-        if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
-            admitadEvent.params.put("uid", admitadUid);
+        synchronized (admitadEvent.params) {
+            admitadEvent.params.put("pk", postbackKey);
+            if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
+                admitadEvent.params.put("uid", admitadUid);
+            }
         }
         return admitadEvent;
     }
@@ -225,7 +229,13 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         }
         notifyLogSuccess(admitadPair.first, trackerListener);
         databaseRepository.remove(admitadPair.first.id);
-        eventQueue.remove(admitadPair);
+        synchronized (eventQueue) {
+            if (!eventQueue.isEmpty() && eventQueue.get(eventQueue.size() - 1) == admitadPair) {
+                eventQueue.remove(eventQueue.size() - 1);
+            } else {
+                eventQueue.remove(admitadPair);
+            }
+        }
         tryLog();
     }
 
@@ -347,7 +357,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                 logConsole("Initialize success, gaid = " + gaid + ", uid = " + admitadUid + ", key = " + postbackKey + ", server availability " + !isServerUnavailable);
             }
 
-            eventQueue.addAll(0, result.events);
+            synchronized (eventQueue) {
+                eventQueue.addAll(0, result.events);
+            }
 
             if (isServerUnavailable) {
                 onServerUnavailable();
