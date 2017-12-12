@@ -74,7 +74,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
 
     @Override
     public void log(AdmitadEvent event, @Nullable TrackerListener trackerListener) {
-        logConsole("New event: " + event);
+        if (Utils.sLogEnabled) {
+            logConsole("New event: " + event);
+        }
         if (TextUtils.isEmpty(admitadUid) && event.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
             notifyLogFailed(AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED,
                     "Admitad UID is missed, event will NOT be cached and send later",
@@ -156,7 +158,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
             Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair = eventQueue.get(eventQueue.size() - 1);
             AdmitadEvent admitadEvent = admitadPair.first;
             if (errorCode == AdmitadTrackerCode.NONE) {
-                logConsole("Trying to send " + admitadEvent.toString());
+                if (Utils.sLogEnabled) {
+                    logConsole("Trying to send " + admitadEvent.toString());
+                }
                 isBusy = true;
                 admitadEvent.params.put("device", gaid);
                 networkRepository.log(admitadEvent, new NetworkLogCallback(admitadPair));
@@ -221,7 +225,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     private void onLogSuccess(Pair<AdmitadEvent, WeakReference<TrackerListener>> admitadPair) {
-        logConsole("log success " + admitadPair.first.toString());
+        if (Utils.sLogEnabled) {
+            logConsole("log success " + admitadPair.first.toString());
+        }
         isBusy = false;
         TrackerListener trackerListener = null;
         if (admitadPair.second != null) {
