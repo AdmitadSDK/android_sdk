@@ -110,6 +110,11 @@ public class NetworkRepositoryImpl implements NetworkRepository {
                 } else {
                     trackerListener.onFailure(response.code(), response.message());
                 }
+
+                final ResponseBody body = response.body();
+                if (body != null) {
+                    body.close();
+                }
             }
         });
     }
