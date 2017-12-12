@@ -26,9 +26,9 @@ public class AdmitadEvent {
     public final int type;
     public final Map<String, String> params;
 
-    public AdmitadEvent(@Type int type, Map<String, String> mainParams) {
+    public AdmitadEvent(@Type final int type, final Map<String, String> mainParams) {
         this.type = type;
-        this.params = mainParams;
+        this.params = Collections.synchronizedMap(mainParams);
     }
 
     public void setId(long id) {
@@ -39,11 +39,11 @@ public class AdmitadEvent {
     public String toString() {
         return "AdmitadEvent{" +
                 "type=" + typeToString(type) +
-                ", params=" + new HashMap<>(params) +
+                ", params=" + params +
                 '}';
     }
 
-    public static String typeToString(@Type int code) {
+    private static String typeToString(@Type final int code) {
         switch (code) {
             case TYPE_FIRST_LAUNCH:
                 return "First launch";

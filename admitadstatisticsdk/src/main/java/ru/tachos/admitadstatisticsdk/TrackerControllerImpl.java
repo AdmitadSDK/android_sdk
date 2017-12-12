@@ -225,11 +225,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         }
         notifyLogSuccess(admitadPair.first, trackerListener);
         databaseRepository.remove(admitadPair.first.id);
-        if (!eventQueue.isEmpty() && eventQueue.get(eventQueue.size() - 1) == admitadPair) {
-            eventQueue.remove(eventQueue.size() - 1);
-        } else {
-            eventQueue.remove(admitadPair);
-        }
+        eventQueue.remove(admitadPair);
         tryLog();
     }
 

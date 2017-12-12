@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
     }
 
     public void manyEventsQueue(View v) {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             AdmitadTracker.getInstance().logRegistration("userRegistration" + i);
             AdmitadTracker.getInstance().logUserLoyalty("userLoyalty" + i, i);
         }

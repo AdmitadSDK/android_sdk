@@ -108,9 +108,8 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
         if (event.id > 0) {
             contentValues.put(AdmitadTrackerContract.TrackEntry._ID, event.id);
         }
-        final Map<String, String> params = new HashMap<>(event.params);
         contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_TYPE, event.type);
-        contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS, new JSONObject(params).toString());
+        contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS, new JSONObject(event.params).toString());
         return contentValues;
     }
 
