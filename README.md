@@ -1,5 +1,5 @@
 # Admitad SDK for Android
-
+Android integration SDK of https://www.admitad.com/
 ## Table of contents
 
 * [Example app](#example-app)
