@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 class DatabaseRepositorySQLite implements DatabaseRepository {
 
@@ -35,13 +34,14 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
 
     @Override
     public void insertOrUpdate(final AdmitadEvent event) {
+        final ContentValues values = parse(event);
         executor.execute(new Runnable() {
 
             @Override
             public void run() {
                 final SQLiteDatabase database = dbHelper.getWritableDatabase();
                 database.beginTransaction();
-                event.id = database.insertWithOnConflict(AdmitadTrackerContract.TrackEntry.TABLE_NAME, null, parse(event), SQLiteDatabase.CONFLICT_REPLACE);
+                event.id = database.insertWithOnConflict(AdmitadTrackerContract.TrackEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 database.setTransactionSuccessful();
                 database.endTransaction();
             }
@@ -109,7 +109,9 @@ class DatabaseRepositorySQLite implements DatabaseRepository {
             contentValues.put(AdmitadTrackerContract.TrackEntry._ID, event.id);
         }
         contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_TYPE, event.type);
-        contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS, new JSONObject(event.params).toString());
+        synchronized (event.params) {
+            contentValues.put(AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS, new JSONObject(event.params).toString());
+        }
         return contentValues;
     }
 
