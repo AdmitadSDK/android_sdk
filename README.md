@@ -6,7 +6,19 @@
 * [Basic integration](#basic-integration)
     * [Add the SDK to your project](#sdk-add)
     * [Usage](#sdk-usage)
-* [License](#license)   
+      * [Initialized](#initialized)
+      * [Registration](#registration)
+      * [Returned user](#returned_user)
+      * [Loyalty](#loyalty)
+      * [Order](#order)
+        * [Paid order](#paid_order)
+        * [Confirmed purchase](#confirmed_purchase)
+      * [Specific event](#specific_event)
+      * [Subscribe for all events](#subscribe_for_all_events)
+      * [More examples](#more_examples)
+      * [Log enabled](#log_enabled)
+    * [Error code](#error_code)
+* [License](#license)
 
 ## <a id="example-app"></a>Example app
 
@@ -46,7 +58,7 @@ And this to the project's gradle:
 ```gradle
  implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6'
 ```
-   
+
 old version:
 
 ```gradle
@@ -56,9 +68,9 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6') {
 ```
 
 ### <a id="sdk-usage"></a>Usage
-
+#### <a id="initialized">Initialized
   * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. We'd like to reccomend to initialize in the `Application#OnCreate` or in the launcher Activity in `Activity#onCreate`. You have to pass context, postback key (non-null key is mandatory, exception is thrown otherwise), callback (optional)
-  
+
   ```java
    AdmitadTracker.initialize(getApplicationContext(), YOUR_ANDROID_POSTBACK_KEY, new TrackerInitializationCallback() {
             @Override
@@ -70,57 +82,47 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6') {
             }
         });
   ```
-  
-  * Admitad uid is required for sending logs. You may pass deeplink by method AdmitadTracker#handleDeeplink. The deeplink must have parameter called `uid` (e.g. `schema://host?uid=YOUR_UID`). If SDK has no UID then no logs will be sent.
-  
-  ```java
-   AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=YOUR_UID"));
-  ```
-  
-  Example of handling deeplink:
-  
+
+
+  * Example of handling deeplink:
+
   ```java
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       onNewIntent(getIntent());
   }
-  
+
   @Override
   protected void onNewIntent(Intent intent) {
       super.onNewIntent(intent);
       setIntent(intent);
-        
+
       if (intent.getData() != null) {
           AdmitadTracker.getInstance().handleDeeplink(intent.getData());
       }
   }
   ```
-  
-  See more examples in the [test project](app/)
-  
-  * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, logs will be stored and send ASAP. There're several events sdk is able to log:
-  
-      * #### Registration 
-      
-      ```java
-      AdmitadTracker.getInstance().logRegistration(*USER_ID*);
-      ```
-      
-      * #### Returned user
-      
-      ```java
-      AdmitadTracker.getInstance().logUserReturn(*USER_ID*, *DAY_COUNT*);
-      ```
 
-      * #### Loyalty
-      
-      ```java
+
+  * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, logs will be stored and send ASAP. There're several events sdk is able to log:
+#### <a id="registration">Registration
+
+      AdmitadTracker.getInstance().logRegistration(*USER_ID*);
+
+#### <a id="returned_user">Returned user
+
+      AdmitadTracker.getInstance().logUserReturn(*USER_ID*, *DAY_COUNT*);
+
+#### <a id="loyalty">Loyalty
+
       AdmitadTracker.getInstance().logUserLoyalty(*USER_ID*, *OPEN_APP_COUNT*);
-      ```
-  
+
+
+
+#### <a id="order">Order
   * To log confirmed purchase or paid order you have to create AdmitadOrder object using builder. e.g.:
-  
+
   ```java
     final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
                 .setCurrencyCode("RUB")
@@ -129,23 +131,19 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6') {
                 .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "UserSurname").putExtra("Age", "18"))
                 .build();
   ```
-  
+
   * Then you can log using `order`:
-  
-      * #### Paid order
-      
-      ```java
+##### <a id="paid_order">Paid order
+
       AdmitadTracker.getInstance().logOrder(order);
-      ```
 
-      * #### Confirmed purchase
-      
-      ```java
+##### <a id="confirmed_purchase">Confirmed purchase
+
       AdmitadTracker.getInstance().logPurchase(order);
-      ```
 
-   * To subscribe for specific event, you can pass callbacks to any log* method, e.g.: 
-   
+#### <a id="specific_event">Specific event
+   * To subscribe for specific event, you can pass callbacks to any log* method, e.g.:
+
   ```java
      AdmitadTracker.getInstance().logRegistration(*USER_ID*, new TrackerListener() {
 
@@ -160,7 +158,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6') {
             }
         });
    ```
-
+#### <a id="subscribe_for_all_events">Subscribe for all events
   * To subscribe for all events, you can call method `AdmitadTracker#addListener`. This method will be always called on sending.
 
   ```java
@@ -177,9 +175,20 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6') {
             }
         });
   ```
-  
-  * Error code can be one of the AdmitadTrackedCode: 
-  
+#### <a id="more_examples">More examples
+
+  * See more examples in the [test project](app/)
+
+#### <a id="log_enabled">Log enabled
+
+  * To enable logs you can call any time:
+  ``` java
+  AdmitadTracker.setLogEnabled(true);
+  ```
+
+### <a id="error_code">Error code
+  * Error code can be one of the AdmitadTrackedCode:
+
   ```java
   public @interface AdmitadTrackerCode {
     int NONE = 0;
@@ -194,12 +203,8 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6') {
     int ERROR_SDK_ADMITAD_UID_MISSED = -1300;
   }
   ```
-  
-  * To enable logs you can call any time: 
-  
-  ``` java
-  AdmitadTracker.setLogEnabled(true);
-  ```
+
+
 
 ## <a id="license"></a>License
 
