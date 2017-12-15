@@ -5,7 +5,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="ru.tachos.admitadstatistic.MainActivity">
+              tools:context="ru.admitad.admitadsdk.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

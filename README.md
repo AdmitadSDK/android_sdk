@@ -22,7 +22,7 @@ Android integration SDK of https://www.admitad.com/
 
 ## <a id="example-app"></a>Example app
 
-You can find examples of use [in this directory](app/src/main/java/ru/tachos/admitadstatistic/MainActivity.java).
+You can find examples of use [in this directory](app/src/main/java/ru/admitad/admitadsdk/MainActivity.java).
 You can open the Android project to see an example on how the admitad SDK can be integrated.
 
 ## <a id="basic-integration"></a>Basic integration
@@ -56,13 +56,13 @@ allprojects {
 And this to the project's gradle:
 
 ```gradle
- implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6'
+ implementation 'admitadsdk:admitadsdksdk:1.4.6'
 ```
 
 old version:
 
 ```gradle
-compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.6') {
+compile('admitadsdk:admitadsdksdk:1.4.6') {
         transitive = true
 }
 ```
