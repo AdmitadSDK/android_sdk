@@ -1,1 +1,1 @@
-include ':app', ':admitadstatisticsdk'
+include ':app', ':admitadsdk'

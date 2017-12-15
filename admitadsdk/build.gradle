@@ -1,0 +1,54 @@
+apply plugin: 'com.android.library'
+
+ext {
+    GOOGLE_VERSION = "11.6.2"
+    OK_HTTP_VERSION = "3.9.1"
+
+    bintrayRepo = 'android_sdk'
+    bintrayName = 'admitadsdk'
+
+    publishedGroupId = 'ru.admitad.admitadsdk'
+    libraryName = 'admitadsdk'
+    artifact = 'admitadsdk'
+
+    libraryDescription = 'A library for logging Admitad events'
+
+    siteUrl = 'https://github.com/AdmitadSDK/android_sdk'
+    gitUrl = 'https://github.com/AdmitadSDK/android_sdk.git'
+
+    libraryVersion = '1.4.7'
+
+    developerId = 'admitad-github'
+    developerName = 'Dmitry Sadovnikov'
+    developerEmail = 'd.sadovnikov@admitad.com'
+
+    licenseName = 'The MIT License (MIT)'
+    licenseUrl = 'https://github.com/AdmitadSDK/android_sdk/blob/master/README.md'
+    allLicenses = ["MIT"]
+}
+
+android {
+    compileSdkVersion 26
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1
+        versionName libraryVersion
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.google.android.gms:play-services-ads:${GOOGLE_VERSION}"
+    implementation "com.squareup.okhttp3:okhttp:${OK_HTTP_VERSION}"
+}
+
+apply from: "${rootDir}/admitadsdk/publish.gradle"
