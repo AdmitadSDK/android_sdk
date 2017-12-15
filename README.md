@@ -56,13 +56,13 @@ allprojects {
 And this to the project's gradle:
 
 ```gradle
- implementation 'admitadsdk:admitadsdksdk:1.4.6'
+ implementation 'admitadsdk:admitadsdksdk:1.4.7'
 ```
 
 old version:
 
 ```gradle
-compile('admitadsdk:admitadsdksdk:1.4.6') {
+compile('admitadsdk:admitadsdksdk:1.4.7') {
         transitive = true
 }
 ```
