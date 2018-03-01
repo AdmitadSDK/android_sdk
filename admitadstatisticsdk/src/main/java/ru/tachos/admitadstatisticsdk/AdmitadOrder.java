@@ -78,6 +78,7 @@ public class AdmitadOrder {
         private final static String FIELD_JSON = "json";
         private final static String FIELD_USER_INFO = "user_info";
         private final static String FIELD_ITEMS = "items";
+        private final static String FIELD_TARIF_CODE = "tc";
 
         private Map<String, String> mainParams = new HashMap<>();
         private List<Item> items = new ArrayList<>();
@@ -100,6 +101,11 @@ public class AdmitadOrder {
 
         public Builder putItem(@NonNull Item item) {
             items.add(item);
+            return this;
+        }
+
+        public Builder setTarifCode(@NonNull String tarifCode) {
+            mainParams.put(FIELD_TARIF_CODE, tarifCode);
             return this;
         }
 
