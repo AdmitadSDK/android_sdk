@@ -131,6 +131,16 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.7') {
                 .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "UserSurname").putExtra("Age", "18"))
                 .build();
   ```
+  
+  You can initialize AdmitadOrder with extra parameter *tarifCode*. Then Admitad can apply this tariff to the order as defined in your agreement. To get tariff codes ask your Admitad account manager.
+  
+  ```java
+    final AdmitadOrder order = new AdmitadOrder.Builder("123-ISBD-123", "500.00")
+              .setCurrencyCode("USD")
+              .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 500))
+              .setTarifCode("book_promo_action")
+              .build();
+  ```
 
   * Then you can log using `order`:
 ##### <a id="paid_order">Paid order
