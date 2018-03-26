@@ -56,13 +56,13 @@ allprojects {
 And this to the project's gradle:
 
 ```gradle
- implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.7'
+ implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8'
 ```
 
 old version:
 
 ```gradle
-compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.7') {
+compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
         transitive = true
 }
 ```
