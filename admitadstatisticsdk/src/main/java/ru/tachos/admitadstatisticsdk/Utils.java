@@ -79,7 +79,20 @@ class Utils {
             }
             jsonObject.put("lang_code", Locale.getDefault().getLanguage());
             jsonObject.put("lang", Locale.getDefault().getDisplayLanguage());
-            jsonObject.put("currency", Currency.getInstance(Locale.getDefault()).getCurrencyCode());
+
+            try {
+                jsonObject.put("currency", Currency.getInstance(Locale.getDefault()).getCurrencyCode());
+            }
+            catch (IllegalArgumentException | NullPointerException e) {
+                // https://developer.android.com/reference/java/util/Currency.html#getInstance(java.util.Locale)
+                // Locale.getDefault() can return:
+                // 1) truncated locales (for example "en" instead of "en_US", because country is optional)
+                // 2) deprecated locales (for example "en_UK" instead of "en_GB")
+                // 3) locales without currency (for example Antarctica)
+                // All of them throw on getCurrencyCode or returned currency can be null.
+                jsonObject.put("currency", "");
+            }
+
             JSONObject jsonDeviceData = new JSONObject();
             jsonDeviceData.put("build_display_id", Build.DISPLAY);
             jsonDeviceData.put("arch", System.getProperty("os.arch"));
