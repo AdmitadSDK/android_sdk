@@ -1,5 +1,8 @@
 # Admitad SDK for Android
 Android integration SDK of https://www.admitad.com/
+
+Admitad help center: https://help.admitad.com/en/advertiser/topic/195-mobile-sdk/
+
 ## Table of contents
 
 * [Example app](#example-app)
