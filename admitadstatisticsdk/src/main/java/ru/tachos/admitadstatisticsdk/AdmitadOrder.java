@@ -79,6 +79,7 @@ public class AdmitadOrder {
         private final static String FIELD_USER_INFO = "user_info";
         private final static String FIELD_ITEMS = "items";
         private final static String FIELD_TARIF_CODE = "tc";
+        private final static String FIELD_PROMOCODE = "promocode";
 
         private Map<String, String> mainParams = new HashMap<>();
         private List<Item> items = new ArrayList<>();
@@ -106,6 +107,11 @@ public class AdmitadOrder {
 
         public Builder setTarifCode(@NonNull String tarifCode) {
             mainParams.put(FIELD_TARIF_CODE, tarifCode);
+            return this;
+        }
+
+        public Builder setPromocode(@NonNull String promocode) {
+            mainParams.put(FIELD_PROMOCODE, promocode);
             return this;
         }
 
