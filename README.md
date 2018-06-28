@@ -108,7 +108,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
   ```
 
 
-  * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, logs will be stored and send ASAP. There're several events sdk is able to log:
+  * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, events will be stored and send ASAP. There're several events sdk is able to track:
 #### <a id="registration">Registration
 
       AdmitadTracker.getInstance().logRegistration(*USER_ID*);
@@ -124,7 +124,7 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
 
 
 #### <a id="order">Order
-  * To log confirmed purchase or paid order you have to create AdmitadOrder object using builder. e.g.:
+  * To track confirmed purchase or paid order you have to create AdmitadOrder object using builder. e.g.:
 
   ```java
     final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
@@ -134,7 +134,8 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
                 .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "UserSurname").putExtra("Age", "18"))
                 .build();
   ```
-  
+ 
+ ###### <a id="tarifCode">tarifCode
   You can initialize AdmitadOrder with extra parameter *tarifCode*. Then Admitad can apply this tariff to the order as defined in your agreement. To get tariff codes ask your Admitad account manager.
   
   ```java
@@ -144,8 +145,18 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
               .setTarifCode("book_promo_action")
               .build();
   ```
+  
+###### <a id="promoCode">promocode
+  You can initialize AdmitadOrder with extra parameter *promocode*. Then Admitad will show promocode for this order in statistics report of your campaign.
+    ```java
+      final AdmitadOrder order = new AdmitadOrder.Builder("123-ISBD-123", "500.00")
+                .setCurrencyCode("USD")
+                .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 500))
+                .setPromocode("PROMO_SUPER_CODE")
+                .build();
+    ```
 
-  * Then you can log using `order`:
+  * Then you can track buying events using `order` object:
 ##### <a id="paid_order">Paid order
 
       AdmitadTracker.getInstance().logOrder(order);
