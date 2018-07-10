@@ -110,6 +110,7 @@ class Utils {
         }
         Map<String, String> params = new HashMap<>();
         params.put("fingerprint", jsonObject.toString());
+        params.put("channel", AdmitadTracker.ADMITAD_MOBILE_CHANNEL);
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_FIRST_LAUNCH, params);
     }
 

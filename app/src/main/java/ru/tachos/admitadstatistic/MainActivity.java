@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
                 .putItem(new AdmitadOrder.Item("Item1", "ItemName1", 3))
                 .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 5))
                 .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "Kek").putExtra("Age", "10"))
+                .setPromocode("PROMO") // setting up promocode for order
                 .build();
         AdmitadTracker.getInstance().logOrder(order, new TrackerListener() {
             @Override

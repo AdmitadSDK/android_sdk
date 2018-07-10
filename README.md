@@ -7,20 +7,22 @@ Admitad help center: https://help.admitad.com/en/advertiser/topic/195-mobile-sdk
 
 * [Example app](#example-app)
 * [Basic integration](#basic-integration)
-    * [Add the SDK to your project](#sdk-add)
-    * [Usage](#sdk-usage)
-      * [Initialized](#initialized)
-      * [Registration](#registration)
-      * [Returned user](#returned_user)
-      * [Loyalty](#loyalty)
-      * [Order](#order)
-        * [Paid order](#paid_order)
-        * [Confirmed purchase](#confirmed_purchase)
-      * [Specific event](#specific_event)
-      * [Subscribe for all events](#subscribe_for_all_events)
-      * [More examples](#more_examples)
-      * [Log enabled](#log_enabled)
-    * [Error code](#error_code)
+    * [Add the SDK to your project](#add-the-sdk-to-your-project)
+    * [Usage](#usage)
+        * [Initialized](#initialized)
+        * [Registration](#registration)
+        * [Returned user](#returned-user)
+        * [Loyalty](#loyalty)
+        * [Order](#order)
+            * [Additional parameters](#additional-parameters)
+            * [Paid order](#paid-order)
+            * [Confirmed purchase](#confirmed-purchase)
+        * [Events deduplication](#events-deduplication)
+        * [Specific event subscription](#specific-event-subscription)
+        * [Subscribe for all events](#subscribe-for-all-events)
+        * [More examples](#more-examples)
+        * [Log enabled](#log-enabled)
+    * [Error code](#error-code)
 * [License](#license)
 
 ## <a id="example-app"></a>Example app
@@ -32,7 +34,7 @@ You can open the Android project to see an example on how the admitad SDK can be
 
 These are the minimal steps required to integrate the admitad SDK into your Android project. We are going to assume that you use Android Studio for your Android development and target an Android API level 14 (Ice Cream Sandwich) or later.
 
-### <a id="sdk-add"></a>Add the SDK to your project
+### <a id="add-the-sdk-to-your-project"></a>Add the SDK to your project
 
 Add repository to the root gradle:
 
@@ -59,19 +61,20 @@ allprojects {
 And this to the project's gradle:
 
 ```gradle
- implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8'
+compile 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.0'
 ```
 
 old version:
 
 ```gradle
-compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
+compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.0') {
         transitive = true
 }
 ```
 
-### <a id="sdk-usage"></a>Usage
-#### <a id="initialized">Initialized
+### <a id="usage"></a>Usage
+#### <a id="initialized"></a>Initialized
+
   * SDK is being initialized async, so you must call AdmitadTracker#initialize before using. We'd like to reccomend to initialize in the `Application#OnCreate` or in the launcher Activity in `Activity#onCreate`. You have to pass context, postback key (non-null key is mandatory, exception is thrown otherwise), callback (optional)
 
   ```java
@@ -85,7 +88,6 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
             }
         });
   ```
-
 
   * Example of handling deeplink:
 
@@ -107,24 +109,29 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
   }
   ```
 
+  * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, events will be stored and send ASAP. There're several events sdk is able to track:
 
-  * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, logs will be stored and send ASAP. There're several events sdk is able to log:
-#### <a id="registration">Registration
+#### <a id="registration"></a>Registration
 
-      AdmitadTracker.getInstance().logRegistration(*USER_ID*);
+  ```java
+    AdmitadTracker.getInstance().logRegistration(*USER_ID*);
+  ```
 
-#### <a id="returned_user">Returned user
+#### <a id="returned-user"></a>Returned user
 
-      AdmitadTracker.getInstance().logUserReturn(*USER_ID*, *DAY_COUNT*);
+  ```java
+    AdmitadTracker.getInstance().logUserReturn(*USER_ID*, *DAY_COUNT*);
+  ```
 
-#### <a id="loyalty">Loyalty
+#### <a id="loyalty"></a>Loyalty
 
-      AdmitadTracker.getInstance().logUserLoyalty(*USER_ID*, *OPEN_APP_COUNT*);
+  ```java
+    AdmitadTracker.getInstance().logUserLoyalty(*USER_ID*, *OPEN_APP_COUNT*);
+  ```
 
-
-
-#### <a id="order">Order
-  * To log confirmed purchase or paid order you have to create AdmitadOrder object using builder. e.g.:
+#### <a id="order"></a>Order
+  
+  * To track confirmed purchase or paid order you have to create AdmitadOrder object using builder. e.g.:
 
   ```java
     final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
@@ -134,31 +141,66 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
                 .setUserInfo(new AdmitadOrder.UserInfo().putExtra("Surname", "UserSurname").putExtra("Age", "18"))
                 .build();
   ```
-  
+
+##### <a id="additional-parameters"></a>Additional parameters
+
+  * You can customize your order using any combination of additional parameters.  
+ 
+###### _<a id="tarifCode"></a>tarifCode_
   You can initialize AdmitadOrder with extra parameter *tarifCode*. Then Admitad can apply this tariff to the order as defined in your agreement. To get tariff codes ask your Admitad account manager.
   
   ```java
     final AdmitadOrder order = new AdmitadOrder.Builder("123-ISBD-123", "500.00")
               .setCurrencyCode("USD")
               .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 500))
-              .setTarifCode("book_promo_action")
+              .setTarifCode("first_time_book_buy")
+              .build();
+  ```
+  
+###### _<a id="promoCode"></a>promocode_
+  You can initialize AdmitadOrder with extra parameter *promocode*. Then Admitad will show promocode for this order in statistics report of your campaign.
+   ```java
+     final AdmitadOrder order = new AdmitadOrder.Builder("123-ISBD-123", "500.00")
+              .setCurrencyCode("USD")
+              .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 500))
+              .setPromocode("PROMO_SUPER_CODE")
               .build();
   ```
 
-  * Then you can log using `order`:
-##### <a id="paid_order">Paid order
-
-      AdmitadTracker.getInstance().logOrder(order);
-
-##### <a id="confirmed_purchase">Confirmed purchase
-
-      AdmitadTracker.getInstance().logPurchase(order);
-
-#### <a id="specific_event">Specific event
-   * To subscribe for specific event, you can pass callbacks to any log* method, e.g.:
+  * Then you can track buying events using `order` object:
+  
+##### <a id="paid-order"></a>Paid order
 
   ```java
-     AdmitadTracker.getInstance().logRegistration(*USER_ID*, new TrackerListener() {
+    AdmitadTracker.getInstance().logOrder(order);
+  ```
+
+##### <a id="confirmed-purchase"></a>Confirmed purchase
+
+  ```java
+    AdmitadTracker.getInstance().logPurchase(order);
+  ```
+
+
+#### <a id="events-deduplication"></a>Events deduplication
+  * You can pass extra parameter *channel* into method when tracking events. It's value will be used for deduplication on Admitad's side.
+  Set channel value to:
+    - `AdmitadTracker.ADMITAD_MOBILE_CHANNEL` if you intend to attribute event to Admitad
+    - name of other affiliate network if you intend to attribute event to other network
+    - `AdmitadTracker.UNKNOWN_CHANNEL` if you don't know to whom the event should be attributed
+
+  ```java
+    String channel = AdmitadTracker.ADMITAD_MOBILE_CHANNEL; // setting admitad channel
+    AdmitadTracker.getInstance().logRegistration("TestRegistrationUid", channel);
+  ```
+
+
+#### <a id="specific-event"></a>Specific event subscription
+   
+  * To subscribe for specific event, you can pass callbacks to any `log*` method, e.g.:
+
+  ```java
+    AdmitadTracker.getInstance().logRegistration(*USER_ID*, new TrackerListener() {
 
             @Override
             public void onSuccess(AdmitadEvent result) {
@@ -171,11 +213,13 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
             }
         });
    ```
-#### <a id="subscribe_for_all_events">Subscribe for all events
+
+#### <a id="subscribe-for-all-events"></a>Subscribe for all events
+  
   * To subscribe for all events, you can call method `AdmitadTracker#addListener`. This method will be always called on sending.
 
   ```java
-   AdmitadTracker.getInstance().addListener(new TrackerListener() {
+    AdmitadTracker.getInstance().addListener(new TrackerListener() {
 
             @Override
             public void onSuccess(AdmitadEvent result) {
@@ -188,18 +232,20 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.4.8') {
             }
         });
   ```
-#### <a id="more_examples">More examples
+#### <a id="more-examples"></a>More examples
 
   * See more examples in the [test project](app/)
 
-#### <a id="log_enabled">Log enabled
+#### <a id="log-enabled"></a>Log enabled
 
   * To enable logs you can call any time:
-  ``` java
-  AdmitadTracker.setLogEnabled(true);
+  
+  ```java
+    AdmitadTracker.setLogEnabled(true);
   ```
 
-### <a id="error_code">Error code
+### <a id="error-code"></a>Error code
+  
   * Error code can be one of the AdmitadTrackedCode:
 
   ```java

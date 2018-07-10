@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class AdmitadTracker {
+    public final static String ADMITAD_MOBILE_CHANNEL = "adm_mobile";
+    public final static String UNKNOWN_CHANNEL = "na";
+
     private TrackerController controller;
 
     public void addListener(@NonNull TrackerListener listener) {
@@ -27,52 +30,105 @@ public final class AdmitadTracker {
         return controller.handleDeeplink(uri);
     }
 
+    // registration with default ADMITAD_MOBILE_CHANNEL
     public void logRegistration(String registrationId) {
-        logRegistration(registrationId, null);
+        logRegistration(registrationId, ADMITAD_MOBILE_CHANNEL, null);
     }
 
+    // registration with default ADMITAD_MOBILE_CHANNEL and listener
     public void logRegistration(String registrationId, @Nullable TrackerListener trackerListener) {
-        controller.log(EventFactory.createRegistrationEvent(registrationId), trackerListener);
+        logRegistration(registrationId, ADMITAD_MOBILE_CHANNEL, trackerListener);
     }
 
+    // registration with preset channel
+    public void logRegistration(String registrationId, String channel) {
+        logRegistration(registrationId, channel, null);
+    }
+
+    // registration with preset channel and listener
+    public void logRegistration(String registrationId, String channel, @Nullable TrackerListener trackerListener) {
+        controller.log(EventFactory.createRegistrationEvent(registrationId, channel), trackerListener);
+    }
+
+    // purchase with default ADMITAD_MOBILE_CHANNEL
     public void logPurchase(AdmitadOrder order) {
-        logPurchase(order, null);
+        logPurchase(order, ADMITAD_MOBILE_CHANNEL, null);
     }
 
+    // purchase with default ADMITAD_MOBILE_CHANNEL and listener
     public void logPurchase(AdmitadOrder order, @Nullable TrackerListener trackerListener) {
-        controller.log(EventFactory.createConfirmedPurchaseEvent(order), trackerListener);
+        logPurchase(order, ADMITAD_MOBILE_CHANNEL, trackerListener);
     }
 
+    // purchase with preset channel
+    public void logPurchase(AdmitadOrder order, String channel) {
+        logPurchase(order, channel, null);
+    }
+
+    // purchase with preset channel and listener
+    public void logPurchase(AdmitadOrder order, String channel, @Nullable TrackerListener trackerListener) {
+        controller.log(EventFactory.createConfirmedPurchaseEvent(order, channel), trackerListener);
+    }
+
+    // order with default ADMITAD_MOBILE_CHANNEL
     public void logOrder(AdmitadOrder order) {
-        logOrder(order, null);
+        logOrder(order, ADMITAD_MOBILE_CHANNEL, null);
     }
 
+    // order with default ADMITAD_MOBILE_CHANNEL and lsitener
     public void logOrder(AdmitadOrder order, @Nullable TrackerListener trackerListener) {
-        controller.log(EventFactory.createPaidOrderEvent(order), trackerListener);
+        logOrder(order, ADMITAD_MOBILE_CHANNEL, trackerListener);
     }
 
+    // order with preset channel
+    public void logOrder(AdmitadOrder order, String channel) {
+        logOrder(order, channel, null);
+    }
+
+    // order with preset channel and listener
+    public void logOrder(AdmitadOrder order, String channel, @Nullable TrackerListener trackerListener) {
+        controller.log(EventFactory.createPaidOrderEvent(order, channel), trackerListener);
+    }
+
+    // user return with default ADMITAD_MOBILE_CHANNEL
     public void logUserReturn(@Nullable String userId, int dayCount) {
-        logUserReturn(userId, dayCount, null);
+        logUserReturn(userId, ADMITAD_MOBILE_CHANNEL, dayCount, null);
     }
 
+    // user return with default ADMITAD_MOBILE_CHANNEL and listener
     public void logUserReturn(@Nullable String userId, int dayCount, @Nullable TrackerListener trackerListener) {
-        controller.log(
-                EventFactory.createUserReturnEvent(
-                        TextUtils.isEmpty(userId) ? controller.getAdmitadUid() : userId,
-                        dayCount),
-                trackerListener);
+        logUserReturn(userId, ADMITAD_MOBILE_CHANNEL, dayCount, trackerListener);
     }
 
+    // user return with preset channel
+    public void logUserReturn(@Nullable String userId, String channel, int dayCount) {
+        logUserReturn(userId, channel, dayCount, null);
+    }
+
+    // user return with preset channel and listener
+    public void logUserReturn(@Nullable String userId, String channel, int dayCount, @Nullable TrackerListener trackerListener) {
+        String user_id = TextUtils.isEmpty(userId) ? controller.getAdmitadUid() : userId;
+        controller.log(EventFactory.createUserReturnEvent(user_id, channel, dayCount), trackerListener);
+    }
+
+    // loyalty with default ADMITAD_MOBILE_CHANNEL
     public void logUserLoyalty(@Nullable String userId, int loyalty) {
-        logUserLoyalty(userId, loyalty, null);
+        logUserLoyalty(userId, ADMITAD_MOBILE_CHANNEL, loyalty, null);
     }
 
+    // loyalty with default ADMITAD_MOBILE_CHANNEL and listener
     public void logUserLoyalty(@Nullable String userId, int loyalty, @Nullable TrackerListener trackerListener) {
-        controller.log(
-                EventFactory.createLoyaltyEvent(
-                        TextUtils.isEmpty(userId) ? controller.getAdmitadUid() : userId,
-                        loyalty),
-                trackerListener);
+        logUserLoyalty(userId, ADMITAD_MOBILE_CHANNEL, loyalty, trackerListener);
+    }
+
+    // loyalty with preset channel
+    public void logUserLoyalty(@Nullable String userId, String channel, int loyalty) {
+        logUserLoyalty(userId, channel, loyalty, null);
+    }
+
+    public void logUserLoyalty(@Nullable String userId, String channel, int loyalty, @Nullable TrackerListener trackerListener) {
+        String user_id = TextUtils.isEmpty(userId) ? controller.getAdmitadUid() : userId;
+        controller.log(EventFactory.createLoyaltyEvent(user_id, channel, loyalty), trackerListener);
     }
 
     private AdmitadTracker(@NonNull Context context,

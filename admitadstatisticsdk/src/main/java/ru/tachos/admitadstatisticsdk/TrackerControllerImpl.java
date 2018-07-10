@@ -77,19 +77,13 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         if (Utils.sLogEnabled) {
             logConsole("New event: " + event);
         }
-        if (TextUtils.isEmpty(admitadUid) && event.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
-            notifyLogFailed(AdmitadTrackerCode.ERROR_SDK_ADMITAD_UID_MISSED,
-                    "Admitad UID is missed, event will NOT be cached and send later",
-                    trackerListener
-            );
-        } else {
-            fillRequiredParams(event);
-            databaseRepository.insertOrUpdate(event);
-            synchronized (eventQueue) {
-                eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
-            }
-            tryLog();
+
+        fillRequiredParams(event);
+        databaseRepository.insertOrUpdate(event);
+        synchronized (eventQueue) {
+            eventQueue.add(0, new Pair<>(event, new WeakReference<>(trackerListener)));
         }
+        tryLog();
     }
 
     @Override
@@ -264,7 +258,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
                 && errorCode != AdmitadTrackerCode.ERROR_NO_INTERNET
                 && errorCode != AdmitadTrackerCode.ERROR_SDK_GAID_MISSED
                 && errorCode != AdmitadTrackerCode.ERROR_SDK_NOT_INITIALIZED) {
-            new Handler().postDelayed(new Runnable() {
+            this.uiHandler.postDelayed(new Runnable() {
 
                 @Override
                 public void run() {

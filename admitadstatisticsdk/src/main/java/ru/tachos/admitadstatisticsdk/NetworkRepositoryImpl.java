@@ -39,11 +39,11 @@ public class NetworkRepositoryImpl implements NetworkRepository {
 
     private static final String SCHEME = "https://";
     private static final String HOST = "ad.admitad.com";
-    private static final String PATH = "r";
+    private static final String PATH = "tt";
 
     private static final String SCHEME_INSTALL = "https://";
     private static final String HOST_INSTALL = "ad.admitad.com";
-    private static final String PATH_INSTALL = "r";
+    private static final String PATH_INSTALL = "tt";
 
     private OkHttpClient okHttpClient;
     private Handler uiHandler;
@@ -140,6 +140,8 @@ public class NetworkRepositoryImpl implements NetworkRepository {
 
     private String getEventConstant(@AdmitadEvent.Type int code) {
         switch (code) {
+            case TYPE_FIRST_LAUNCH:
+                return "install";
             case TYPE_REGISTRATION:
                 return "registration";
             case TYPE_CONFIRMED_PURCHASE:
@@ -165,9 +167,7 @@ public class NetworkRepositoryImpl implements NetworkRepository {
         for (final String key : admitadEvent.params.keySet()) {
             addParam(queryBuilder, key, admitadEvent.params.get(key), queryBuilder.length() == 0);
         }
-        if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
-            addParam(queryBuilder, TRACKING, getEventConstant(admitadEvent.type), false);
-        }
+        addParam(queryBuilder, TRACKING, getEventConstant(admitadEvent.type), false);
         return queryBuilder.toString();
     }
 
