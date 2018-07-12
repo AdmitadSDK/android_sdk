@@ -1,0 +1,12 @@
+stages:
+  - release
+
+release:
+  stage: release
+  script:
+    - echo "Release to Github"
+  environment:
+    name: production
+    url: https://github.com/AdmitadSDK/android_sdk
+  only:
+  - master
