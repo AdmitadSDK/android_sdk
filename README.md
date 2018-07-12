@@ -22,7 +22,6 @@ Admitad help center: https://help.admitad.com/en/advertiser/topic/195-mobile-sdk
         * [Subscribe for all events](#subscribe-for-all-events)
         * [More examples](#more-examples)
         * [Log enabled](#log-enabled)
-    * [Error code](#error-code)
 * [License](#license)
 
 ## <a id="example-app"></a>Example app
@@ -244,32 +243,13 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.0') {
     AdmitadTracker.setLogEnabled(true);
   ```
 
-### <a id="error-code"></a>Error code
-  
-  * Error code can be one of the AdmitadTrackedCode:
-
-  ```java
-  public @interface AdmitadTrackerCode {
-    int NONE = 0;
-    int SUCCESS = 200;
-
-    int ERROR_GENERIC = -100;
-    int ERROR_NO_INTERNET = -200;
-    int ERROR_SERVER_UNAVAILABLE = -1;
-    int ERROR_SDK_NOT_INITIALIZED = -1000;
-    int ERROR_SDK_POSTBACK_CODE_MISSED = -1100;
-    int ERROR_SDK_GAID_MISSED = -1200;
-    int ERROR_SDK_ADMITAD_UID_MISSED = -1300;
-  }
-  ```
-
 
 
 ## <a id="license"></a>License
 
 The admitad SDK is licensed under the MIT License.
 
-Copyright (c) 2017 Admitad GmbH
+Copyright (c) 2018 Admitad GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
