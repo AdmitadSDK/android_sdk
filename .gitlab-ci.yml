@@ -33,9 +33,7 @@ release:
   environment:
     name: bintray
     url: https://bintray.com/admitadsdk/android_sdk/admitadstatisticsdk/$CI_COMMIT_TAG
-  # release only tagged master branch
+  # release only protected tags
   only:
     - tags
-  except:
-    - /^(?!master).+/
 
