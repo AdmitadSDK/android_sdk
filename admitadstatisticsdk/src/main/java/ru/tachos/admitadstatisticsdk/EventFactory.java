@@ -46,6 +46,6 @@ class EventFactory {
         params.put(USER_ID, userId);
         params.put(CHANNEL, channel);
         params.put(LOYAL, String.valueOf(loyal));
-        return new AdmitadEvent(AdmitadEvent.Type.TYPE_RETURNED_USER, params);
+        return new AdmitadEvent(AdmitadEvent.Type.TYPE_LOYALTY, params);
     }
 }
