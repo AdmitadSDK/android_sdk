@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+import java.util.Random;
 import java.util.UUID;
 
 import ru.tachos.admitadstatisticsdk.AdmitadEvent;
@@ -67,7 +68,10 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
     }
 
     public void orderClick(View v) {
-        final AdmitadOrder order = new AdmitadOrder.Builder("123", "100.00")
+        Random r = new Random();
+        int order_id = r.nextInt(10000);
+
+        final AdmitadOrder order = new AdmitadOrder.Builder("id" + String.valueOf(order_id), "100.00")
                 .setCurrencyCode("RUB")
                 .putItem(new AdmitadOrder.Item("Item1", "ItemName1", 3))
                 .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 5))
@@ -88,7 +92,10 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
     }
 
     public void purchaseClick(View v) {
-        final AdmitadOrder order = new AdmitadOrder.Builder("321", "1756.00")
+        Random r = new Random();
+        int purchase_id = r.nextInt(10000);
+
+        final AdmitadOrder order = new AdmitadOrder.Builder("id" + String.valueOf(purchase_id), "1756.00")
                 .setCurrencyCode("USD")
                 .putItem(new AdmitadOrder.Item("Item1", "ItemName1", 7))
                 .putItem(new AdmitadOrder.Item("Item2", "ItemName2", 8))

@@ -8,7 +8,7 @@ interface TrackerController {
 
     void removeListener(TrackerListener listener);
 
-    void log(AdmitadEvent event, TrackerListener trackerListener);
+    void track(AdmitadEvent event, TrackerListener trackerListener);
 
     //Returns true if uid handled
     boolean handleDeeplink(Uri uri);

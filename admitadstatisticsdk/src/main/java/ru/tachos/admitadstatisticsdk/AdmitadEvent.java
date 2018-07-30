@@ -1,20 +1,15 @@
 package ru.tachos.admitadstatisticsdk;
 
 import android.support.annotation.IntDef;
-import android.util.Log;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_CONFIRMED_PURCHASE;
-import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_FIRST_LAUNCH;
+import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_FINGERPRINT;
+import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_INSTALL;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_LOYALTY;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_PAID_ORDER;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_REGISTRATION;
@@ -45,8 +40,8 @@ public class AdmitadEvent {
 
     private static String typeToString(@Type final int code) {
         switch (code) {
-            case TYPE_FIRST_LAUNCH:
-                return "First launch";
+            case TYPE_INSTALL:
+                return "Install";
             case TYPE_REGISTRATION:
                 return "Registration";
             case TYPE_CONFIRMED_PURCHASE:
@@ -57,19 +52,22 @@ public class AdmitadEvent {
                 return "Returned user";
             case TYPE_LOYALTY:
                 return "Loyalty";
+            case TYPE_FINGERPRINT:
+                return "Fingerprint";
         }
         return "";
     }
 
-    @IntDef({TYPE_FIRST_LAUNCH, TYPE_REGISTRATION, TYPE_CONFIRMED_PURCHASE, TYPE_PAID_ORDER, TYPE_RETURNED_USER, TYPE_LOYALTY})
+    @IntDef({TYPE_INSTALL, TYPE_REGISTRATION, TYPE_CONFIRMED_PURCHASE, TYPE_PAID_ORDER, TYPE_RETURNED_USER, TYPE_LOYALTY, TYPE_FINGERPRINT})
     @Retention(RetentionPolicy.SOURCE)
     public  @interface Type {
-        int TYPE_FIRST_LAUNCH = 1;
+        int TYPE_INSTALL = 1;
         int TYPE_REGISTRATION = 2;
         int TYPE_CONFIRMED_PURCHASE = 3;
         int TYPE_PAID_ORDER = 4;
         int TYPE_RETURNED_USER = 5;
         int TYPE_LOYALTY = 6;
+        int TYPE_FINGERPRINT = 7;
     }
 
 }

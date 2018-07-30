@@ -18,12 +18,10 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import ru.tachos.admitadstatisticsdk.network_state.NetworkManager;
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
 
 class Utils {
@@ -33,7 +31,7 @@ class Utils {
 
     public static boolean sLogEnabled;
 
-    static AdmitadEvent getDeviceInfo(Context context) {
+    static AdmitadEvent createFingerprintEvent(Context context) {
         JSONObject jsonObject = new JSONObject();
         try {
             @SuppressLint("HardwareIds") String androidId =
@@ -111,7 +109,7 @@ class Utils {
         Map<String, String> params = new HashMap<>();
         params.put("fingerprint", jsonObject.toString());
         params.put("channel", AdmitadTracker.ADMITAD_MOBILE_CHANNEL);
-        return new AdmitadEvent(AdmitadEvent.Type.TYPE_FIRST_LAUNCH, params);
+        return new AdmitadEvent(AdmitadEvent.Type.TYPE_FINGERPRINT, params);
     }
 
     static String getCachedGAID(Context context) {

@@ -14,7 +14,6 @@ import android.util.Pair;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -73,7 +72,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     }
 
     @Override
-    public void log(AdmitadEvent event, @Nullable TrackerListener trackerListener) {
+    public void track(AdmitadEvent event, @Nullable TrackerListener trackerListener) {
         if (Utils.sLogEnabled) {
             logConsole("New event: " + event);
         }
@@ -167,7 +166,9 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private AdmitadEvent fillRequiredParams(AdmitadEvent admitadEvent) {
         synchronized (admitadEvent.params) {
             admitadEvent.params.put("pk", postbackKey);
-            if (admitadEvent.type != AdmitadEvent.Type.TYPE_FIRST_LAUNCH) {
+            // TODO: when we get uid after install this check will not be necessary
+            if (admitadEvent.type != AdmitadEvent.Type.TYPE_INSTALL
+                    && admitadEvent.type != AdmitadEvent.Type.TYPE_FINGERPRINT) {
                 admitadEvent.params.put("uid", admitadUid);
             }
         }

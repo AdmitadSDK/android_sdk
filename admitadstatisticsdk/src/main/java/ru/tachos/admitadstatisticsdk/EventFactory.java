@@ -1,9 +1,5 @@
 package ru.tachos.admitadstatisticsdk;
 
-import android.content.Context;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,5 +43,11 @@ class EventFactory {
         params.put(CHANNEL, channel);
         params.put(LOYAL, String.valueOf(loyal));
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_LOYALTY, params);
+    }
+
+    static AdmitadEvent createInstallEvent(String channel) {
+        Map<String, String> params = new HashMap<>();
+        params.put(CHANNEL, channel);
+        return new AdmitadEvent(AdmitadEvent.Type.TYPE_INSTALL, params);
     }
 }

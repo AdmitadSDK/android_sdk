@@ -1,33 +1,26 @@
 package ru.tachos.admitadstatisticsdk;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.cert.CertPathValidatorException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.*;
 import okhttp3.Callback;
 
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_CONFIRMED_PURCHASE;
-import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_FIRST_LAUNCH;
+import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_INSTALL;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_LOYALTY;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_PAID_ORDER;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_REGISTRATION;
 import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_RETURNED_USER;
+import static ru.tachos.admitadstatisticsdk.AdmitadEvent.Type.TYPE_FINGERPRINT;
 
 public class NetworkRepositoryImpl implements NetworkRepository {
     private static final int TIME_OUT = 20; //seconds
@@ -41,9 +34,9 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     private static final String HOST = "ad.admitad.com";
     private static final String PATH = "tt";
 
-    private static final String SCHEME_INSTALL = "https://";
-    private static final String HOST_INSTALL = "ad.admitad.com";
-    private static final String PATH_INSTALL = "tt";
+    private static final String SCHEME_FP = "https://";
+    private static final String HOST_FP = "artfut.com";
+    private static final String PATH_FP = "dedup_android";
 
     private OkHttpClient okHttpClient;
     private Handler uiHandler;
@@ -60,17 +53,16 @@ public class NetworkRepositoryImpl implements NetworkRepository {
     @Override
     public void log(final AdmitadEvent admitadEvent, final TrackerListener trackerListener) {
         StringBuilder urlBuilder = new StringBuilder();
-        if (admitadEvent.type == TYPE_FIRST_LAUNCH) {
-            urlBuilder.append(SCHEME_INSTALL)
-                    .append(HOST_INSTALL).append("/").append(PATH_INSTALL);
+
+        if (admitadEvent.type == TYPE_FINGERPRINT) {
+            urlBuilder.append(SCHEME_FP).append(HOST_FP).append("/").append(PATH_FP);
         } else {
-            urlBuilder.append(SCHEME)
-                    .append(HOST).append("/").append(PATH);
+            urlBuilder.append(SCHEME).append(HOST).append("/").append(PATH);
         }
 
         urlBuilder.append("?")
                 .append(getUrlQuery(admitadEvent));
-
+        
         final String url = urlBuilder.toString();
         logConsole(url);
 
@@ -121,26 +113,22 @@ public class NetworkRepositoryImpl implements NetworkRepository {
 
     @Override
     public boolean isServerAvailable() {
-            try {
-                final URL url = new URL(SCHEME + HOST);
-                final HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
-                urlc.setConnectTimeout(TIME_OUT * 1000);
-                urlc.connect();
-                if (urlc.getResponseCode() == 200) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (MalformedURLException e1) {
-                return false;
-            } catch (IOException e) {
-                return false;
-            }
+        try {
+            final URL url = new URL(SCHEME + HOST);
+            final HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+            urlc.setConnectTimeout(TIME_OUT * 1000);
+            urlc.connect();
+            return urlc.getResponseCode() == 200;
+        } catch (MalformedURLException e1) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private String getEventConstant(@AdmitadEvent.Type int code) {
         switch (code) {
-            case TYPE_FIRST_LAUNCH:
+            case TYPE_INSTALL:
                 return "install";
             case TYPE_REGISTRATION:
                 return "registration";
@@ -152,6 +140,8 @@ public class NetworkRepositoryImpl implements NetworkRepository {
                 return "returned";
             case TYPE_LOYALTY:
                 return "loyalty";
+            case TYPE_FINGERPRINT:
+                return "fingerprint";
         }
         return "";
     }

@@ -8,9 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public final class AdmitadTracker {
     public final static String ADMITAD_MOBILE_CHANNEL = "adm_mobile";
     public final static String UNKNOWN_CHANNEL = "na";
@@ -47,7 +44,7 @@ public final class AdmitadTracker {
 
     // registration with preset channel and listener
     public void logRegistration(String registrationId, String channel, @Nullable TrackerListener trackerListener) {
-        controller.log(EventFactory.createRegistrationEvent(registrationId, channel), trackerListener);
+        controller.track(EventFactory.createRegistrationEvent(registrationId, channel), trackerListener);
     }
 
     // purchase with default ADMITAD_MOBILE_CHANNEL
@@ -67,7 +64,7 @@ public final class AdmitadTracker {
 
     // purchase with preset channel and listener
     public void logPurchase(AdmitadOrder order, String channel, @Nullable TrackerListener trackerListener) {
-        controller.log(EventFactory.createConfirmedPurchaseEvent(order, channel), trackerListener);
+        controller.track(EventFactory.createConfirmedPurchaseEvent(order, channel), trackerListener);
     }
 
     // order with default ADMITAD_MOBILE_CHANNEL
@@ -87,7 +84,7 @@ public final class AdmitadTracker {
 
     // order with preset channel and listener
     public void logOrder(AdmitadOrder order, String channel, @Nullable TrackerListener trackerListener) {
-        controller.log(EventFactory.createPaidOrderEvent(order, channel), trackerListener);
+        controller.track(EventFactory.createPaidOrderEvent(order, channel), trackerListener);
     }
 
     // user return with default ADMITAD_MOBILE_CHANNEL
@@ -108,7 +105,7 @@ public final class AdmitadTracker {
     // user return with preset channel and listener
     public void logUserReturn(@Nullable String userId, String channel, int dayCount, @Nullable TrackerListener trackerListener) {
         String user_id = TextUtils.isEmpty(userId) ? controller.getAdmitadUid() : userId;
-        controller.log(EventFactory.createUserReturnEvent(user_id, channel, dayCount), trackerListener);
+        controller.track(EventFactory.createUserReturnEvent(user_id, channel, dayCount), trackerListener);
     }
 
     // loyalty with default ADMITAD_MOBILE_CHANNEL
@@ -126,15 +123,40 @@ public final class AdmitadTracker {
         logUserLoyalty(userId, channel, loyalty, null);
     }
 
+    // loyalty with preset channel and listener
     public void logUserLoyalty(@Nullable String userId, String channel, int loyalty, @Nullable TrackerListener trackerListener) {
         String user_id = TextUtils.isEmpty(userId) ? controller.getAdmitadUid() : userId;
-        controller.log(EventFactory.createLoyaltyEvent(user_id, channel, loyalty), trackerListener);
+        controller.track(EventFactory.createLoyaltyEvent(user_id, channel, loyalty), trackerListener);
+    }
+
+    // install with presert channel and listener
+    public void logInstall(String channel, @Nullable TrackerListener trackerListener) {
+        controller.track(EventFactory.createInstallEvent(channel), trackerListener);
+    }
+
+    // install with default ADMITAD_MOBILE_CHANNEL and listener
+    public void logInstall(@Nullable TrackerListener trackerListener) {
+        logInstall(ADMITAD_MOBILE_CHANNEL, trackerListener);
+    }
+
+    // install with preset channel
+    public void logInstall(String channel) {
+        logInstall(channel, null);
+    }
+
+    // install with default ADMITAD_MOBILE_CHANNEL
+    public void logInstall() {
+        logInstall(ADMITAD_MOBILE_CHANNEL, null);
     }
 
     private AdmitadTracker(@NonNull Context context,
                            @NonNull String postbackKey,
                            @Nullable TrackerInitializationCallback callback) {
         initTracker(context, postbackKey, callback);
+    }
+
+    private void trackFingerprint(Context context) {
+        controller.track(Utils.createFingerprintEvent(context), null);
     }
 
     private void initTracker(@NonNull final Context context,
@@ -151,7 +173,8 @@ public final class AdmitadTracker {
                     @Override
                     public void onInitializationSuccess() {
                         if (Utils.isFirstLaunch(controller.getContext())) {
-                            trackFirstLaunch(controller.getContext());
+                            trackFingerprint(controller.getContext());
+                            logInstall();
                         }
 
                         if (callback != null) {
@@ -167,10 +190,6 @@ public final class AdmitadTracker {
                     }
                 }
         );
-    }
-
-    private void trackFirstLaunch(Context context) {
-        controller.log(Utils.getDeviceInfo(context), null);
     }
 
     public static void setLogEnabled(boolean isEnabled) {
