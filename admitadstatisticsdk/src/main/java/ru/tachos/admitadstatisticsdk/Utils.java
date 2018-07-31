@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -18,9 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
 
@@ -31,12 +28,11 @@ class Utils {
 
     public static boolean sLogEnabled;
 
-    static AdmitadEvent createFingerprintEvent(Context context) {
+    static JSONObject collectDeviceInfo(Context context) {
         JSONObject jsonObject = new JSONObject();
         try {
-            @SuppressLint("HardwareIds") String androidId =
-                    Settings.Secure.getString(context.getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
+            @SuppressLint("HardwareIds")
+            String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
             if (!TextUtils.isEmpty(androidId)) {
                 jsonObject.put("hardware_id", androidId);
                 jsonObject.put("is_hardware_id_real", false);
@@ -80,8 +76,7 @@ class Utils {
 
             try {
                 jsonObject.put("currency", Currency.getInstance(Locale.getDefault()).getCurrencyCode());
-            }
-            catch (IllegalArgumentException | NullPointerException e) {
+            } catch (IllegalArgumentException | NullPointerException e) {
                 // https://developer.android.com/reference/java/util/Currency.html#getInstance(java.util.Locale)
                 // Locale.getDefault() can return:
                 // 1) truncated locales (for example "en" instead of "en_US", because country is optional)
@@ -106,10 +101,8 @@ class Utils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Map<String, String> params = new HashMap<>();
-        params.put("fingerprint", jsonObject.toString());
-        params.put("channel", AdmitadTracker.ADMITAD_MOBILE_CHANNEL);
-        return new AdmitadEvent(AdmitadEvent.Type.TYPE_FINGERPRINT, params);
+
+        return jsonObject;
     }
 
     static String getCachedGAID(Context context) {
@@ -120,7 +113,6 @@ class Utils {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_CACHED_GAID, gaid).apply();
     }
 
-    @Nullable
     static String getAdmitadUid(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_ADMITAD_ID, "");
     }

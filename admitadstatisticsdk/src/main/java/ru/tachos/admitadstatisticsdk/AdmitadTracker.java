@@ -155,8 +155,9 @@ public final class AdmitadTracker {
         initTracker(context, postbackKey, callback);
     }
 
+    // track fingerprint with default ADMITAD_MOBILE_CHANNEL
     private void trackFingerprint(Context context) {
-        controller.track(Utils.createFingerprintEvent(context), null);
+        controller.track(EventFactory.createFingerprintEvent(ADMITAD_MOBILE_CHANNEL, context), null);
     }
 
     private void initTracker(@NonNull final Context context,

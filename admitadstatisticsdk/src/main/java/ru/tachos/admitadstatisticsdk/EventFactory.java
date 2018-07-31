@@ -1,5 +1,9 @@
 package ru.tachos.admitadstatisticsdk;
 
+import android.content.Context;
+
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,5 +53,14 @@ class EventFactory {
         Map<String, String> params = new HashMap<>();
         params.put(CHANNEL, channel);
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_INSTALL, params);
+    }
+
+    static AdmitadEvent createFingerprintEvent(String channel, Context context) {
+        JSONObject fingerprint = Utils.collectDeviceInfo(context);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("fingerprint", fingerprint.toString());
+        params.put("channel", channel);
+        return new AdmitadEvent(AdmitadEvent.Type.TYPE_FINGERPRINT, params);
     }
 }
