@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
         AdmitadTracker.getInstance().addListener(this);
 
         onNewIntent(getIntent());
+
+        logConsole("Current admitad_uid: " + AdmitadTracker.getInstance().getAdmitadUid());
     }
 
     @Override
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements TrackerListener {
 
     public void setupNewAdmitadUid(View v) {
         AdmitadTracker.getInstance().handleDeeplink(Uri.parse("schema://host?uid=" + UUID.randomUUID()));
+        logConsole("Current admitad_uid: " + AdmitadTracker.getInstance().getAdmitadUid());
     }
 
     private void logConsole(String message) {

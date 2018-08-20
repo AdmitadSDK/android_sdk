@@ -30,6 +30,12 @@ public final class AdmitadTracker {
         return controller.handleDeeplink(uri);
     }
 
+    // return currently stored admitad uid
+    public String getAdmitadUid() {
+        String uid = controller.getAdmitadUid();
+        return uid != null ? uid : "";
+    }
+
     // registration with default ADMITAD_MOBILE_CHANNEL
     public void logRegistration(String registrationId) {
         logRegistration(registrationId, ADMITAD_MOBILE_CHANNEL, null);
