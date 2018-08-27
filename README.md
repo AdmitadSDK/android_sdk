@@ -60,13 +60,13 @@ allprojects {
 And this to the project's gradle:
 
 ```gradle
-compile 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.1'
+compile 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.2'
 ```
 
 old version:
 
 ```gradle
-compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.1') {
+compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.2') {
         transitive = true
 }
 ```
@@ -106,6 +106,11 @@ compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.5.1') {
           AdmitadTracker.getInstance().handleDeeplink(intent.getData());
       }
   }
+  ```
+  
+  * You can get current uid:
+  ```java
+  String admitad_uid = AdmitadTracker.getInstance().getAdmitadUid();
   ```
 
   * When `AdmitadTracker#initialize` is called, it's possible to start tracking even if sdk is not initialized, if sdk has any uid value, events will be stored and send ASAP. There're several events sdk is able to track:
