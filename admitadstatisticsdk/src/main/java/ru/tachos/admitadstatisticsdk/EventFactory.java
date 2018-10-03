@@ -13,23 +13,28 @@ class EventFactory {
     private static final String DAY = "day";
     private static final String LOYAL = "loyal";
     private static final String CHANNEL = "channel";
+    private static final String FINGERPRINT = "fingerprint";
+    private static final String SDK = "sdk";
 
     static AdmitadEvent createRegistrationEvent(String registrationId, String channel) {
         Map<String, String> params = new HashMap<>();
         params.put(OID, registrationId);
         params.put(CHANNEL, channel);
+        params.put(SDK, AdmitadTracker.VERSION_NAME);
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_REGISTRATION, params);
     }
 
     static AdmitadEvent createConfirmedPurchaseEvent(AdmitadOrder order, String channel) {
         AdmitadEvent order_event = order.toEvent(AdmitadEvent.Type.TYPE_CONFIRMED_PURCHASE);
         order_event.params.put(CHANNEL, channel);
+        order_event.params.put(SDK, AdmitadTracker.VERSION_NAME);
         return order_event;
     }
 
     static AdmitadEvent createPaidOrderEvent(AdmitadOrder order, String channel) {
         AdmitadEvent order_event = order.toEvent(AdmitadEvent.Type.TYPE_PAID_ORDER);
         order_event.params.put(CHANNEL, channel);
+        order_event.params.put(SDK, AdmitadTracker.VERSION_NAME);
         return order_event;
     }
 
@@ -38,6 +43,7 @@ class EventFactory {
         params.put(USER_ID, userId);
         params.put(CHANNEL, channel);
         params.put(DAY, String.valueOf(days));
+        params.put(SDK, AdmitadTracker.VERSION_NAME);
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_RETURNED_USER, params);
     }
 
@@ -46,12 +52,14 @@ class EventFactory {
         params.put(USER_ID, userId);
         params.put(CHANNEL, channel);
         params.put(LOYAL, String.valueOf(loyal));
+        params.put(SDK, AdmitadTracker.VERSION_NAME);
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_LOYALTY, params);
     }
 
     static AdmitadEvent createInstallEvent(String channel) {
         Map<String, String> params = new HashMap<>();
         params.put(CHANNEL, channel);
+        params.put(SDK, AdmitadTracker.VERSION_NAME);
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_INSTALL, params);
     }
 
@@ -59,8 +67,9 @@ class EventFactory {
         JSONObject fingerprint = Utils.collectDeviceInfo(context);
 
         Map<String, String> params = new HashMap<>();
-        params.put("fingerprint", fingerprint.toString());
-        params.put("channel", channel);
+        params.put(FINGERPRINT, fingerprint.toString());
+        params.put(CHANNEL, channel);
+        params.put(SDK, AdmitadTracker.VERSION_NAME);
         return new AdmitadEvent(AdmitadEvent.Type.TYPE_FINGERPRINT, params);
     }
 }
