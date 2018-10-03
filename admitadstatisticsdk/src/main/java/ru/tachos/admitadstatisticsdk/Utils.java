@@ -49,7 +49,7 @@ class Utils {
                     NetworkState.getConnectivityStatus(context) == NetworkState.WIFI);
             jsonObject.put("os", "Android");
             jsonObject.put("os_version", Build.VERSION.RELEASE);
-            jsonObject.put("sdk", BuildConfig.VERSION_NAME);
+            jsonObject.put("sdk", AdmitadTracker.VERSION_NAME);
             jsonObject.put("installDate",
                     new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZZZZ",
                             Locale.getDefault())

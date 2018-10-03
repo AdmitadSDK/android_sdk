@@ -12,6 +12,9 @@ public final class AdmitadTracker {
     public final static String ADMITAD_MOBILE_CHANNEL = "adm_mobile";
     public final static String UNKNOWN_CHANNEL = "na";
 
+    // AdmitadSDK version string
+    public static final String VERSION_NAME = BuildConfig.VERSION_NAME;
+
     private TrackerController controller;
 
     public void addListener(@NonNull TrackerListener listener) {
