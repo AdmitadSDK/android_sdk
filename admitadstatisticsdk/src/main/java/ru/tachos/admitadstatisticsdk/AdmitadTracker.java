@@ -13,7 +13,7 @@ public final class AdmitadTracker {
     public final static String UNKNOWN_CHANNEL = "na";
 
     // AdmitadSDK version string
-    public static final String VERSION_NAME = "1.6.1";
+    public static final String VERSION_NAME = "1.6.2";
 
     private TrackerController controller;
 

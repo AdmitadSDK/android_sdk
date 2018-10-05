@@ -10,7 +10,7 @@ class TrackerDatabaseHelper  extends SQLiteOpenHelper {
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
     private static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + AdmitadTrackerContract.TrackEntry.TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + AdmitadTrackerContract.TrackEntry.TABLE_NAME + " (" +
                     AdmitadTrackerContract.TrackEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     AdmitadTrackerContract.TrackEntry.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP +
                     AdmitadTrackerContract.TrackEntry.COLUMN_NAME_PARAMS + TEXT_TYPE + " )";
