@@ -2,7 +2,10 @@ package ru.tachos.admitadstatisticsdk;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -97,6 +100,34 @@ class Utils {
             }
             jsonDeviceData.put("cpu_abi", cpu_abi);
             jsonDeviceData.put("cpu_abi2", cpu_abi2);
+
+            // https://developer.android.com/training/monitoring-device-state/battery-monitoring
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = context.registerReceiver(null, ifilter);
+            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, 1);
+            float batteryPct = level / (float)scale;
+
+            String state;
+            switch (status) {
+                case BatteryManager.BATTERY_STATUS_UNKNOWN:
+                    state = "unknown"; break;
+                case BatteryManager.BATTERY_STATUS_CHARGING:
+                    state = "charging"; break;
+                case BatteryManager.BATTERY_STATUS_DISCHARGING:
+                    state = "discharging"; break;
+                case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
+                    state = "not charging"; break;
+                case BatteryManager.BATTERY_STATUS_FULL:
+                    state = "full"; break;
+                default:
+                    state = "unknown";
+            }
+
+            jsonDeviceData.put("battery_level", batteryPct);
+            jsonDeviceData.put("battery_state", state);
+
             jsonObject.put("deviceData", jsonDeviceData);
         } catch (JSONException e) {
             e.printStackTrace();
