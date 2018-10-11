@@ -60,7 +60,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         this.networkRepository = networkRepository;
         this.uiHandler = uiHandler;
         Collections.synchronizedList(eventQueue);
-        initilize(callback);
+        initialize(callback);
     }
 
     public void addListener(@NonNull TrackerListener listener) {
@@ -124,7 +124,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
         return context;
     }
 
-    private void initilize(@Nullable TrackerInitializationCallback callback) {
+    private void initialize(@Nullable TrackerInitializationCallback callback) {
         NetworkManager networkManager = new NetworkManager(context);
         networkManager.addListener(this);
         this.networkState = networkManager.getCurrentState();
@@ -166,9 +166,7 @@ final class TrackerControllerImpl implements TrackerController, NetworkManager.L
     private AdmitadEvent fillRequiredParams(AdmitadEvent admitadEvent) {
         synchronized (admitadEvent.params) {
             admitadEvent.params.put("pk", postbackKey);
-            // TODO: when we get uid after install this check will not be necessary
-            if (admitadEvent.type != AdmitadEvent.Type.TYPE_INSTALL
-                    && admitadEvent.type != AdmitadEvent.Type.TYPE_FINGERPRINT) {
+            if (admitadEvent.type != AdmitadEvent.Type.TYPE_FINGERPRINT) {
                 admitadEvent.params.put("uid", admitadUid);
             }
         }

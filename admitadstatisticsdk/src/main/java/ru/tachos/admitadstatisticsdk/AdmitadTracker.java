@@ -8,14 +8,97 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public final class AdmitadTracker {
+    // static instance of AdmitadTracker class
+    @SuppressLint("StaticFieldLeak")
+    private static AdmitadTracker instance;
+
+    // tracking controller
+    private TrackerController controller;
+
+    //default Admitad channel values
     public final static String ADMITAD_MOBILE_CHANNEL = "adm_mobile";
     public final static String UNKNOWN_CHANNEL = "na";
 
     // AdmitadSDK version string
-    public static final String VERSION_NAME = "1.6.2";
+    public static final String VERSION_NAME = "1.6.3";
 
-    private TrackerController controller;
+    // delay before sending install and fingerprint
+    private static long installSendDelay = 15;
+
+    private AdmitadTracker(@NonNull Context context,
+                           @NonNull String postbackKey,
+                           @Nullable TrackerInitializationCallback callback) {
+        initTracker(context, postbackKey, callback);
+    }
+
+    public static void initialize(@NonNull Context context,
+                                  @NonNull String postbackKey,
+                                  @Nullable TrackerInitializationCallback callback) {
+        instance = new AdmitadTracker(context, postbackKey, callback);
+    }
+
+    public static AdmitadTracker getInstance() {
+        if (instance == null) {
+            throw new NullPointerException("You must call AdmitadTracker.initialize() " +
+                    "before using getInstance() method");
+        }
+
+        return instance;
+    }
+
+    private void initTracker(@NonNull final Context context,
+                             @NonNull String postbackKey,
+                             @Nullable final TrackerInitializationCallback callback) {
+        this.controller = new TrackerControllerImpl(
+                context,
+                postbackKey,
+                new Handler(),
+                new DatabaseRepositorySQLite(context),
+                new NetworkRepositoryImpl(),
+                new TrackerInitializationCallback() {
+
+                    @Override
+                    public void onInitializationSuccess() {
+                        if (Utils.isFirstLaunch(controller.getContext())) {
+                            // new threads will be created only if queue is full
+                            // corePoolSize - number of core threads = 1
+                            ScheduledExecutorService exc = Executors.newScheduledThreadPool(1);
+
+                            // runnable task for fingerprint tracking
+                            Runnable track_fp = new Runnable() {
+                                @Override
+                                public void run() {
+                                    trackFingerprint(controller.getContext());
+                                    logInstall(controller.getContext());
+                                }
+                            };
+
+                            // schedule runnable task with installSendDelay delay
+                            exc.schedule(track_fp, installSendDelay, TimeUnit.SECONDS);
+                            // manually shutdown ScheduledExecutorService,
+                            // but all previously scheduled threads will be executed
+                            exc.shutdown();
+                        }
+
+                        if (callback != null) {
+                            callback.onInitializationSuccess();
+                        }
+                    }
+
+                    @Override
+                    public void onInitializationFailed(Exception exception) {
+                        if (callback != null) {
+                            callback.onInitializationFailed(exception);
+                        }
+                    }
+                }
+        );
+    }
 
     public void addListener(@NonNull TrackerListener listener) {
         controller.addListener(listener);
@@ -25,12 +108,16 @@ public final class AdmitadTracker {
         controller.removeListener(listener);
     }
 
-    //Returns true if uid handled successfully
+    public static void setLogEnabled(boolean isEnabled) {
+        Utils.sLogEnabled = isEnabled;
+    }
+
+    // returns true if uid handled successfully
     public boolean handleDeeplink(@Nullable Uri uri) {
         return controller.handleDeeplink(uri);
     }
 
-    // return currently stored admitad uid
+    // returns currently stored admitad_uid
     public String getAdmitadUid() {
         String uid = controller.getAdmitadUid();
         return uid != null ? uid : "";
@@ -139,87 +226,27 @@ public final class AdmitadTracker {
     }
 
     // install with presert channel and listener
-    public void logInstall(String channel, @Nullable TrackerListener trackerListener) {
-        controller.track(EventFactory.createInstallEvent(channel), trackerListener);
+    public void logInstall(Context context, String channel, @Nullable TrackerListener trackerListener) {
+        controller.track(EventFactory.createInstallEvent(channel, context), trackerListener);
     }
 
     // install with default ADMITAD_MOBILE_CHANNEL and listener
-    public void logInstall(@Nullable TrackerListener trackerListener) {
-        logInstall(ADMITAD_MOBILE_CHANNEL, trackerListener);
+    public void logInstall(Context context, @Nullable TrackerListener trackerListener) {
+        logInstall(context, ADMITAD_MOBILE_CHANNEL, trackerListener);
     }
 
     // install with preset channel
-    public void logInstall(String channel) {
-        logInstall(channel, null);
+    public void logInstall(Context context, String channel) {
+        logInstall(context, channel, null);
     }
 
     // install with default ADMITAD_MOBILE_CHANNEL
-    public void logInstall() {
-        logInstall(ADMITAD_MOBILE_CHANNEL, null);
-    }
-
-    private AdmitadTracker(@NonNull Context context,
-                           @NonNull String postbackKey,
-                           @Nullable TrackerInitializationCallback callback) {
-        initTracker(context, postbackKey, callback);
+    public void logInstall(Context context) {
+        logInstall(context, ADMITAD_MOBILE_CHANNEL, null);
     }
 
     // track fingerprint with default ADMITAD_MOBILE_CHANNEL
     private void trackFingerprint(Context context) {
         controller.track(EventFactory.createFingerprintEvent(ADMITAD_MOBILE_CHANNEL, context), null);
-    }
-
-    private void initTracker(@NonNull final Context context,
-                             @NonNull String postbackKey,
-                             @Nullable final TrackerInitializationCallback callback) {
-        this.controller = new TrackerControllerImpl(
-                context,
-                postbackKey,
-                new Handler(),
-                new DatabaseRepositorySQLite(context),
-                new NetworkRepositoryImpl(),
-                new TrackerInitializationCallback() {
-
-                    @Override
-                    public void onInitializationSuccess() {
-                        if (Utils.isFirstLaunch(controller.getContext())) {
-                            trackFingerprint(controller.getContext());
-                            logInstall();
-                        }
-
-                        if (callback != null) {
-                            callback.onInitializationSuccess();
-                        }
-                    }
-
-                    @Override
-                    public void onInitializationFailed(Exception exception) {
-                        if (callback != null) {
-                            callback.onInitializationFailed(exception);
-                        }
-                    }
-                }
-        );
-    }
-
-    public static void setLogEnabled(boolean isEnabled) {
-        Utils.sLogEnabled = isEnabled;
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private static AdmitadTracker instance;
-
-    public static AdmitadTracker getInstance() {
-        if (instance == null) {
-            throw new NullPointerException("You must call AdmitadTracker#initialize() before using getInstance() method");
-        }
-
-        return instance;
-    }
-
-    public static void initialize(@NonNull Context context,
-                                  @NonNull String postbackKey,
-                                  @Nullable TrackerInitializationCallback callback) {
-        instance = new AdmitadTracker(context, postbackKey, callback);
     }
 }

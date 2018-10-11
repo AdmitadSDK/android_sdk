@@ -12,14 +12,20 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Currency;
+import java.util.List;
 import java.util.Locale;
 
 import ru.tachos.admitadstatisticsdk.network_state.NetworkState;
@@ -28,6 +34,8 @@ class Utils {
     private static final String KEY_CACHED_GAID = "KEY_CACHED_GAID";
     private static final String KEY_FIRST_START = "ADMITAD_TRACKER_KEY_FIRST_START";
     private static final String KEY_ADMITAD_ID = "ADMITAD_ID";
+    private static final String KEY_REFERRER = "INSTALL_REFERRER";
+    private final static String TAG = "AdmitadTracker";
 
     public static boolean sLogEnabled;
 
@@ -127,6 +135,7 @@ class Utils {
 
             jsonDeviceData.put("battery_level", batteryPct);
             jsonDeviceData.put("battery_state", state);
+            jsonDeviceData.put("localip", getLocalIpAddress());
 
             jsonObject.put("deviceData", jsonDeviceData);
         } catch (JSONException e) {
@@ -152,6 +161,17 @@ class Utils {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_ADMITAD_ID, gaid).apply();
     }
 
+    static String getReferrer(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_REFERRER, "");
+    }
+
+    static void cacheReferrer(Context context, String referrer) {
+        String cachedReferrer = Utils.getReferrer(context);
+        if (!TextUtils.isEmpty(referrer) && !TextUtils.equals(cachedReferrer, referrer)) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_REFERRER, referrer).apply();
+        }
+    }
+
     static boolean isFirstLaunch(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean isFirstStart = sharedPreferences.getBoolean(KEY_FIRST_START, true);
@@ -159,5 +179,33 @@ class Utils {
             sharedPreferences.edit().putBoolean(KEY_FIRST_START, false).apply();
         }
         return isFirstStart;
+    }
+
+    public static String getLocalIpAddress() {
+        String address = "";
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
+                        if (intf.getName().contains("wlan")) {
+                            // WiFi interfaces are prioritized
+                            return addr.getHostAddress();
+                        } else if (TextUtils.isEmpty(address)) {
+                            // keep first non-WiFi address if we won't find WiFi
+                            address = addr.getHostAddress();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (sLogEnabled) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+
+        return address;
     }
 }
