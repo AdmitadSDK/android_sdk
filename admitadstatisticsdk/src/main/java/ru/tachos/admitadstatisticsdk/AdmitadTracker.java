@@ -25,14 +25,18 @@ public final class AdmitadTracker {
     public final static String UNKNOWN_CHANNEL = "na";
 
     // AdmitadSDK version string
-    public static final String VERSION_NAME = "1.6.3";
+    public static final String VERSION_NAME = "1.6.4";
 
     // delay before sending install and fingerprint
-    private static long installSendDelay = 15;
+    private final static long INSTALL_SEND_DELAY = 15;
+
+    // delay in seconds before requesting install referrer
+    private final static long INSTALL_REFERRER_DELAY = 0;
 
     private AdmitadTracker(@NonNull Context context,
                            @NonNull String postbackKey,
                            @Nullable TrackerInitializationCallback callback) {
+        initInstallReferrer(context);
         initTracker(context, postbackKey, callback);
     }
 
@@ -51,6 +55,22 @@ public final class AdmitadTracker {
         return instance;
     }
 
+    /**
+     * Init instance requesting referrer from Install Referrer service
+     * @param context app context
+     */
+    private void initInstallReferrer(Context context) {
+        AdmitadInstallReferrer installReferrer = new AdmitadInstallReferrer(context);
+        installReferrer.setInitialRetryDelay(INSTALL_REFERRER_DELAY);
+        installReferrer.requestInstallReferrer();
+    }
+
+    /**
+     * Init tracking controller instance
+     * @param context app context
+     * @param postbackKey Admitad campaign postback key
+     * @param callback callback function
+     */
     private void initTracker(@NonNull final Context context,
                              @NonNull String postbackKey,
                              @Nullable final TrackerInitializationCallback callback) {
@@ -78,8 +98,8 @@ public final class AdmitadTracker {
                                 }
                             };
 
-                            // schedule runnable task with installSendDelay delay
-                            exc.schedule(track_fp, installSendDelay, TimeUnit.SECONDS);
+                            // schedule runnable task with INSTALL_SEND_DELAY delay
+                            exc.schedule(track_fp, INSTALL_SEND_DELAY, TimeUnit.SECONDS);
                             // manually shutdown ScheduledExecutorService,
                             // but all previously scheduled threads will be executed
                             exc.shutdown();

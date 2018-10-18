@@ -8,6 +8,9 @@ Admitad help center: https://help.admitad.com/en/advertiser/topic/195-mobile-sdk
 * [Example app](#example-app)
 * [Basic integration](#basic-integration)
     * [Add the SDK to your project](#add-the-sdk-to-your-project)
+    * [Install referrer](#install-referrer)
+        * [Google Play Store intent](#-google-play-store-intent)
+        * [Google Play Referrer API](#-google-play-referrer-api)
     * [Usage](#usage)
         * [Initialized](#initialized)
         * [Registration](#registration)
@@ -60,15 +63,65 @@ allprojects {
 And this to the project's gradle:
 
 ```gradle
-implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.3'
+implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.4'
 ```
 
 old version:
 
 ```gradle
-compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.3') {
+compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.4') {
         transitive = true
 }
+```
+
+### <a id="install-referrer"></a>Install referrer
+
+**Important:** This feature is supported if you are using **AdmitadSDK v1.6.4 or above**.
+
+Admitad needs install referrer of the application to attribute installs properly.
+Google provides two methods to receive install referrers, so AdmitadSDK implements both of them to increase reliability.
+
+#### <a id="install-referrer-intent"></a> Google Play Store intent
+
+Install referrer can be captured with a broadcast receiver using the Google Play Store `INSTALL_REFERRER` intent.
+If you are **not using your own broadcast receiver** add the following code into the application tag of your `AndroidManifest.xml`.
+
+```xml
+    <application
+
+        <receiver android:name="ru.tachos.admitadstatisticsdk.AdmitadBroadcastReceiver"
+            android:permission="android.permission.INSTALL_PACKAGES"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+```
+
+Your application manifest file will look like one below
+
+![img](https://user-images.githubusercontent.com/33836185/47154749-d5bed100-d2eb-11e8-9572-db0c859dfc22.png)
+
+If you are **using your own broadcast receiver** implement its `onReceive` method with the following code.
+
+```java
+    public void onReceive(Context context, Intent intent) {
+        // call Admitad receiver method
+        new AdmitadBroadcastReceiver().onReceive(context, intent);
+
+        /* your code */
+    }
+```
+
+#### <a id="install-referrer-api"></a> Google Play Referrer API
+
+Install referrer can be received from Google Play Referrer API. This is quicker and more reliable method.
+Please add the following line to the project's gradle:
+
+```gradle
+implementation 'com.android.installreferrer:installreferrer:1.0'
 ```
 
 ### <a id="usage"></a>Usage

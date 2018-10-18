@@ -16,7 +16,7 @@ ext {
     siteUrl = 'https://github.com/AdmitadSDK/android_sdk'
     gitUrl = 'https://github.com/AdmitadSDK/android_sdk.git'
 
-    libraryVersion = '1.6.3'
+    libraryVersion = '1.6.4'
 
     developerId = 'admitad-github'
     developerName = 'Dmitry Sadovnikov'
@@ -49,6 +49,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.google.android.gms:play-services-ads:${GOOGLE_VERSION}"
     implementation "com.squareup.okhttp3:okhttp:${OK_HTTP_VERSION}"
+    implementation 'com.android.installreferrer:installreferrer:1.0'
 }
 
 apply from: "${rootDir}/admitadstatisticsdk/publish.gradle"
