@@ -49,30 +49,13 @@ allprojects {
 }
 ```
 
-old version:
-
-```gradle
-allprojects {
-    repositories {
-        jcenter()
-        maven { url "https://maven.google.com" }
-    }
-}
-```
-
 And this to the project's gradle:
 
 ```gradle
 implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.4'
+implementation 'com.android.installreferrer:installreferrer:1.0'
 ```
 
-old version:
-
-```gradle
-compile('ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.4') {
-        transitive = true
-}
-```
 
 ### <a id="install-referrer"></a>Install referrer
 
