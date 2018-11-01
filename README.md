@@ -52,7 +52,7 @@ allprojects {
 And this to the project's gradle:
 
 ```gradle
-implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.4'
+implementation 'ru.tachos.admitadstatisticsdk:admitadstatisticsdk:1.6.5'
 implementation 'com.android.installreferrer:installreferrer:1.0'
 ```
 

@@ -25,7 +25,10 @@ public final class AdmitadTracker {
     public final static String UNKNOWN_CHANNEL = "na";
 
     // AdmitadSDK version string
-    public static final String VERSION_NAME = "1.6.4";
+    public static final String VERSION_NAME = "1.6.5";
+    public static final String DEVICE_TYPE = "mobile";
+    public static final String OS_TYPE = "android";
+    public static final String METHOD_TYPE = "mob_sdk";
 
     // delay before sending install and fingerprint
     private final static long INSTALL_SEND_DELAY = 15;
